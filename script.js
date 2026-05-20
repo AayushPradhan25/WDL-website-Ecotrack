@@ -311,6 +311,7 @@ const API={
     getTrucks:()=>apiReq('/trucks'),
     addTruck:d=>apiReq('/trucks',{method:'POST',body:JSON.stringify(d)}),
     updateTruck:(id,d)=>apiReq(`/trucks/${id}`,{method:'PATCH',body:JSON.stringify(d)}),
+    updateTruckLocation:(id,d)=>apiReq(`/trucks/${id}/location`,{method:'PATCH',body:JSON.stringify(d)}),
     getComplaints:()=>apiReq('/complaints'),
     getMyComplaints:()=>apiReq('/complaints/my'),
     getComplaintById:id=>apiReq(`/complaints/${id}`),

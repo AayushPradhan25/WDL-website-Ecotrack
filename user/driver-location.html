@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Driver GPS Sharing | EcoSmart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../style.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        .driver-container {
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+        
+        .driver-header {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+        
+        .driver-header h1 {
+            margin: 0;
+            font-size: 1.75rem;
+        }
+        
+        .driver-panel {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: 1.2fr 0.8fr;
+        }
+        
+        .driver-card,
+        .tracker-card {
+            background: white;
+            border-radius: 1.25rem;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.05);
+        }
+        
+        .driver-card select,
+        .driver-card button {
+            width: 100%;
+            margin-top: 0.75rem;
+        }
+        
+        #driverMap {
+            min-height: 420px;
+            border-radius: 1.25rem;
+            overflow: hidden;
+        }
+        
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            font-weight: 600;
+        }
+        
+        .share-metrics {
+            display: grid;
+            gap: 0.9rem;
+            margin-top: 1.25rem;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+            padding: 0.95rem 1rem;
+            background: #f8fafc;
+            border-radius: 0.95rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="driver-container">
+        <div class="driver-header">
+            <div>
+                <h1>Driver GPS Sharing</h1>
+                <p style="color:#475569; max-width:620px;">Share your truck's live location from your mobile device with the EcoSmart fleet so customers and operations can see the latest position.</p>
+            </div>
+            <div class="status-pill" id="shareStatus">Status: idle</div>
+        </div>
+
+        <div class="driver-panel">
+            <section class="driver-card">
+                <h2>Select Truck</h2>
+                <p>Choose the truck you are currently driving. This will update the fleet map with live GPS coordinates.</p>
+                <select id="truckSelect" aria-label="Select truck"></select>
+                <button class="btn btn-primary" id="startShare">Start Sharing Location</button>
+                <button class="btn btn-secondary" id="stopShare" style="margin-top:0.5rem;">Stop Sharing</button>
+                <div class="share-metrics">
+                    <div class="metric"><strong>Current coords</strong><span id="currentCoords">Waiting for GPS...</span></div>
+                    <div class="metric"><strong>Last update</strong><span id="lastUpdated">Never</span></div>
+                    <div class="metric"><strong>Selected truck</strong><span id="selectedTruck">None</span></div>
+                </div>
+            </section>
+
+            <section class="tracker-card">
+                <h2>Live Map</h2>
+                <div id="driverMap"></div>
+            </section>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        let driverMap;
+        let truckMarker;
+        let tracking = false;
+        let selectedTruckId = null;
+
+        function updateShareStatus(text, type = 'info') {
+            const status = document.getElementById('shareStatus');
+            if (!status) return;
+            status.textContent = `Status: ${text}`;
+            status.style.background = type === 'error' ? '#fee2e2' : type === 'success' ? '#d1fae5' : '#eff6ff';
+            status.style.color = type === 'error' ? '#b91c1c' : type === 'success' ? '#065f46' : '#1d4ed8';
+        }
+
+        async function loadTrucks() {
+            const select = document.getElementById('truckSelect');
+            try {
+                const trucks = await API.getTrucks();
+                if (!trucks.length) {
+                    select.innerHTML = '<option value="">No trucks available</option>';
+                    return;
+                }
+                select.innerHTML = trucks.map(t => `<option value="${t.id}">${t.number} — ${t.driverName || 'Unnamed driver'}</option>`).join('');
+                const params = new URLSearchParams(window.location.search);
+                const urlTruck = params.get('truckId');
+                if (urlTruck && trucks.some(t => t.id === Number(urlTruck))) {
+                    select.value = urlTruck;
+                }
+                selectedTruckId = Number(select.value);
+                document.getElementById('selectedTruck').textContent = trucks.find(t => t.id === selectedTruckId) ? .number || 'None';
+            } catch (err) {
+                console.error('Failed to load trucks:', err);
+                updateShareStatus('Unable to load trucks', 'error');
+            }
+        }
+
+        function refreshSelectedTruck() {
+            const select = document.getElementById('truckSelect');
+            selectedTruckId = Number(select.value);
+            const selectedName = select.options[select.selectedIndex] ? .text || 'None';
+            document.getElementById('selectedTruck').textContent = selectedName;
+        }
+
+        async function handlePosition(position) {
+            if (!tracking || !position ? .coords || !selectedTruckId) return;
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
+            document.getElementById('currentCoords').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+            document.getElementById('lastUpdated').textContent = new Date().toLocaleTimeString();
+            if (driverMap) {
+                const coords = [lat, lng];
+                if (truckMarker) {
+                    truckMarker.setLatLng(coords);
+                } else {
+                    truckMarker = MAP.addMarker(driverMap, coords, `<b>Your Truck</b><br>${document.getElementById('selectedTruck').textContent}`, 'truck');
+                }
+                driverMap.setView(coords, 14);
+            }
+            try {
+                await API.updateTruckLocation(selectedTruckId, {
+                    latitude: lat,
+                    longitude: lng
+                });
+                updateShareStatus('Sharing live GPS', 'success');
+            } catch (err) {
+                console.error('Location update failed:', err);
+                updateShareStatus('GPS share failed', 'error');
+            }
+        }
+
+        function startTracking() {
+            if (tracking) return;
+            refreshSelectedTruck();
+            if (!selectedTruckId) {
+                updateShareStatus('Please select a truck first', 'error');
+                return;
+            }
+            if (!navigator.geolocation) {
+                updateShareStatus('Geolocation not supported', 'error');
+                return;
+            }
+            tracking = true;
+            updateShareStatus('Starting GPS share...', 'info');
+            MAP.watchPosition(handlePosition);
+        }
+
+        function stopTracking() {
+            if (!tracking) return;
+            tracking = false;
+            MAP.stopWatch();
+            updateShareStatus('Stopped GPS sharing', 'info');
+        }
+
+        document.addEventListener('DOMContentLoaded', async() => {
+            driverMap = MAP.init('driverMap');
+            await loadTrucks();
+            document.getElementById('truckSelect').addEventListener('change', refreshSelectedTruck);
+            document.getElementById('startShare').addEventListener('click', startTracking);
+            document.getElementById('stopShare').addEventListener('click', stopTracking);
+        });
+
+        window.addEventListener('beforeunload', () => {
+            if (tracking) MAP.stopWatch();
+        });
+    </script>
+</body>
+
+</html>

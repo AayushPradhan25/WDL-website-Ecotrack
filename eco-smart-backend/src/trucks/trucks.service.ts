@@ -26,6 +26,18 @@ export class TrucksService {
     await this.findOne(id);
     return this.prisma.truck.update({ where: { id }, data });
   }
+  
+  async updateLocation(id: number, data: { latitude: number; longitude: number }) {
+    return this.prisma.truck.update({
+      where: { id },
+      data: {
+        latitude: data.latitude,
+        longitude: data.longitude,
+        status: 'on-route',
+        lastActive: new Date(),
+      },
+    });
+  }
 
   async remove(id: number) {
     await this.findOne(id);

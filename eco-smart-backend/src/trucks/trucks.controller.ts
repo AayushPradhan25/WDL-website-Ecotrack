@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
 import { TrucksService } from './trucks.service';
-import { CreateTruckDto, UpdateTruckDto, AddTruckLogDto } from './dto/truck.dto';
+import { CreateTruckDto, UpdateTruckDto, UpdateTruckLocationDto, AddTruckLogDto } from './dto/truck.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -36,6 +36,12 @@ export class TrucksController {
   @Roles('ADMIN')
   update(@Param('id') id: string, @Body() updateTruckDto: UpdateTruckDto) {
     return this.trucksService.update(+id, updateTruckDto);
+  }
+
+  // PATCH /trucks/:id/location — authenticated drivers can push live GPS coordinates
+  @Patch(':id/location')
+  updateLocation(@Param('id') id: string, @Body() updateTruckLocationDto: UpdateTruckLocationDto) {
+    return this.trucksService.updateLocation(+id, updateTruckLocationDto);
   }
 
   // DELETE /trucks/:id — Admin only: remove a truck

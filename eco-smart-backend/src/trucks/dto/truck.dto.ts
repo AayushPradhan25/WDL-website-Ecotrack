@@ -22,6 +22,14 @@ export class UpdateTruckDto {
   status?: string;
 }
 
+export class UpdateTruckLocationDto {
+  @IsNumber()
+  latitude: number;
+
+  @IsNumber()
+  longitude: number;
+}
+
 export class AddTruckLogDto {
   @IsString()
   message: string;

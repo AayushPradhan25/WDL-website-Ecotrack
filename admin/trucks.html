@@ -10,31 +10,60 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <!-- Leaflet Maps CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
+
     <style>
-        :root {
+         :root {
             --primary: #10b981;
             --bg: #f8fafc;
             --sidebar-dark: #0f172a;
         }
-
-        .content-wrapper { padding: 0; height: calc(100vh - 70px); position: relative; }
-
-        #adminMap { height: 100%; width: 100%; z-index: 1; }
-
-        .fleet-overlay { 
-            position: absolute; top: 20px; left: 20px; width: 300px; background: white; 
-            padding: 1.5rem; border-radius: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
-            z-index: 1000; max-height: 80%; overflow-y: auto;
+        
+        .content-wrapper {
+            padding: 0;
+            height: calc(100vh - 70px);
+            position: relative;
         }
-        .truck-item { 
-            display: flex; align-items: center; gap: 12px; padding: 12px 0; 
-            border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: 0.2s;
+        
+        #adminMap {
+            height: 100%;
+            width: 100%;
+            z-index: 1;
         }
-        .truck-item:hover { background: #f8fafc; }
-        .truck-status { width: 10px; height: 10px; border-radius: 50%; }
-
-</style>
+        
+        .fleet-overlay {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 300px;
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-height: 80%;
+            overflow-y: auto;
+        }
+        
+        .truck-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .truck-item:hover {
+            background: #f8fafc;
+        }
+        
+        .truck-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+    </style>
     <link rel="stylesheet" href="../style.css">
 </head>
 
@@ -62,13 +91,14 @@
     <script src="../config.js"></script>
     <script src="../script.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', async () => {
+        let map;
+        document.addEventListener('DOMContentLoaded', async() => {
             const fleetList = document.getElementById('fleetList');
-            
+
             try {
-                const map = window.MAP.init('adminMap');
+                map = window.MAP.init('adminMap');
                 const trucks = await window.API.getTrucks();
-                
+
                 if (trucks.length === 0) {
                     fleetList.innerHTML = '<p>No trucks registered.</p>';
                 } else {
@@ -83,14 +113,14 @@
                         </div>
                     `).join('');
 
-                    // Add dummy markers for demo (centered around New Delhi)
-                    const markers = [
-                        { coords: [28.6139, 77.2090], name: trucks[0]?.number || 'T1' },
-                        { coords: [28.6250, 77.2210], name: trucks[1]?.number || 'T2' }
-                    ];
-
-                    markers.forEach(m => {
-                        window.MAP.addMarker(map, m.coords, `<b>${m.name}</b><br>Status: Active`, 'truck');
+                    window.adminTruckMarkers = trucks.map((t) => {
+                        const coords = [t.latitude || MAP_DEFAULT[0], t.longitude || MAP_DEFAULT[1]];
+                        const marker = window.MAP.addMarker(map, coords, `<b>${t.number}</b><br>Driver: ${t.driverName || '--'}<br>Status: ${t.status}`, 'truck');
+                        return {
+                            coords,
+                            marker,
+                            truck: t
+                        };
                     });
                 }
 
@@ -100,8 +130,14 @@
         });
 
         function focusTruck(idx) {
-            // In a real app, this would center the map on the truck's GPS coords
-            window.UI.notify('Tracking Truck location...');
+            const target = window.adminTruckMarkers ? .[idx];
+            if (target ? .marker && target.coords) {
+                map ? .setView(target.coords, 14);
+                target.marker.setZIndexOffset(1000);
+                window.UI.notify(`Focused on truck ${target.truck.number}`, 'success');
+            } else {
+                window.UI.notify('Truck location unavailable.', 'warning');
+            }
         }
     </script>
 </body>
