@@ -1,0 +1,159 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            Int            @id @default(autoincrement())
+  email         String         @unique
+  name          String
+  password      String
+  role          String         @default("USER")
+  status        String         @default("active")
+  ecoCoins      Int            @default(0)
+  phone         String?
+  address       String?
+  latitude      Float?
+  longitude     Float?
+  resetToken    String?
+  resetTokenExpiry DateTime?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  complaints    Complaint[]
+  notifications Notification[]
+  rewards       UserReward[]
+  truckRequests TruckRequest[]
+  listings      Listing[]      @relation("Listings")
+  purchases     Listing[]      @relation("Purchases")
+}
+
+model Truck {
+  id         Int        @id @default(autoincrement())
+  number     String     @unique
+  driverName String
+  driverPhone String?
+  status     String     @default("inactive")
+  latitude   Float?
+  longitude  Float?
+  route      String?
+  capacity   Int?
+  lastActive DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  logs       TruckLog[]
+  schedules  Schedule[]
+}
+
+model TruckLog {
+  id        Int      @id @default(autoincrement())
+  truckId   Int
+  truck     Truck    @relation(fields: [truckId], references: [id], onDelete: Cascade)
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model TruckRequest {
+  id               Int      @id @default(autoincrement())
+  userId           Int
+  user             User     @relation(fields: [userId], references: [id])
+  title            String
+  description      String
+  location         String
+  priority         String   @default("MEDIUM")
+  status           String   @default("PENDING")
+  preferredDate    DateTime?
+  preferredTime    String?
+  adminNotes       String?
+  estimatedArrival DateTime?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model Schedule {
+  id          Int      @id @default(autoincrement())
+  truckId     Int?
+  truck       Truck?   @relation(fields: [truckId], references: [id], onDelete: SetNull)
+  dayOfWeek   String
+  time        String
+  location    String
+  activityType String  @default("COLLECTION")
+  status      String   @default("SCHEDULED")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Dustbin {
+  id        Int      @id @default(autoincrement())
+  location  String
+  fillLevel Int      @default(0)
+  status    String   @default("active")
+  latitude  Float?
+  longitude Float?
+  lastCleaned DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Complaint {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  title       String
+  description String
+  location    String
+  category    String?
+  imageUrl    String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Reward {
+  id          Int          @id @default(autoincrement())
+  name        String
+  description String
+  coinsNeeded Int
+  imageUrl    String?
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  userRewards UserReward[]
+}
+
+model UserReward {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  rewardId  Int
+  reward    Reward   @relation(fields: [rewardId], references: [id])
+  claimedAt DateTime @default(now())
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  title     String
+  message   String
+  type      String   @default("info")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Listing {
+  id          Int      @id @default(autoincrement())
+  sellerId    Int
+  seller      User     @relation("Listings", fields: [sellerId], references: [id])
+  buyerId     Int?
+  buyer       User?    @relation("Purchases", fields: [buyerId], references: [id])
+  title       String
+  description String
+  category    String
+  price       Int
+  quantity    String
+  status      String   @default("AVAILABLE")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}

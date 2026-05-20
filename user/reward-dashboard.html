@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rewards & Leaderboard | EcoSmart — Earn & Redeem</title>
+<meta name="description" content="Earn eco-coins for green actions, climb the leaderboard, and redeem exciting rewards.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+
+.content-wrapper{padding:1.75rem 2rem;flex:1;}
+
+.tier-hero{background:linear-gradient(135deg,#064e3b 0%,#10b981 60%,#34d399 100%);border-radius:1.2rem;padding:2.2rem;color:white;margin-bottom:1.75rem;display:flex;align-items:center;gap:2rem;position:relative;overflow:hidden;}
+.tier-hero::after{content:'🌿';position:absolute;right:2rem;top:50%;transform:translateY(-50%);font-size:7rem;opacity:0.12;}
+.tier-badge{width:90px;height:90px;background:rgba(255,255,255,0.15);border:3px solid rgba(255,255,255,0.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.5rem;flex-shrink:0;}
+.tier-info{flex:1;position:relative;}
+.tier-info h2{margin:0 0 0.3rem;font-size:1.8rem;font-weight:800;}
+.tier-info p{margin:0 0 0.8rem;opacity:0.9;}
+.progress-bar-wrap{background:rgba(255,255,255,0.2);border-radius:99px;height:12px;overflow:hidden;margin-bottom:0.5rem;}
+.progress-bar{height:100%;background:linear-gradient(90deg,#fbbf24,#f59e0b);border-radius:99px;width:0;transition:width 1.5s ease-out;}
+.progress-labels{display:flex;justify-content:space-between;font-size:0.78rem;opacity:0.85;}
+
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.25rem;margin-bottom:1.75rem;}
+.stat-card{background:white;border-radius:1rem;padding:1.25rem 1.4rem;display:flex;align-items:center;gap:1rem;border:1px solid #e2e8f0;transition:all 0.25s;}
+.stat-card:hover{transform:translateY(-3px);border-color:#10b981;box-shadow:0 8px 20px rgba(16,185,129,0.1);}
+.stat-icon{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.stat-label{font-size:0.72rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;}
+.stat-num{font-size:1.6rem;font-weight:800;color:#1e293b;}
+
+.main-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;}
+.section-box{background:white;border-radius:1rem;padding:1.5rem;border:1px solid #e2e8f0;}
+.section-title{font-size:1.05rem;font-weight:700;color:#1e293b;margin:0 0 1.25rem;display:flex;align-items:center;gap:8px;}
+.section-title i{color:#10b981;}
+
+.reward-card{border:1.5px solid #e2e8f0;border-radius:0.9rem;padding:1.1rem;margin-bottom:0.85rem;display:flex;align-items:center;justify-content:space-between;transition:all 0.25s;}
+.reward-card:hover{border-color:#fbbf24;background:#fffbeb;}
+.reward-card.locked{opacity:0.5;}
+.reward-icon-wrap{width:44px;height:44px;border-radius:10px;background:#fef3c7;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#d97706;flex-shrink:0;margin-right:0.85rem;}
+.reward-info{flex:1;}
+.reward-info h4{margin:0 0 3px;font-size:0.9rem;font-weight:700;}
+.reward-cost{font-size:0.8rem;color:#d97706;font-weight:700;display:flex;align-items:center;gap:4px;}
+.redeem-btn{padding:0.5rem 1.1rem;border:none;border-radius:8px;background:#10b981;color:white;font-weight:700;font-size:0.82rem;cursor:pointer;transition:all 0.2s;font-family:inherit;white-space:nowrap;}
+.redeem-btn:hover{background:#059669;transform:translateY(-1px);}
+.redeem-btn:disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed;transform:none;}
+
+.leader-row{display:flex;align-items:center;gap:0.85rem;padding:0.7rem 0.6rem;border-radius:0.75rem;margin-bottom:4px;transition:background 0.2s;}
+.leader-row:hover{background:#f8fffe;}
+.leader-row.me{background:#d1fae5!important;}
+.rank-badge{width:30px;height:30px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.82rem;flex-shrink:0;}
+.rank-1{background:linear-gradient(135deg,#fbbf24,#f59e0b);color:white;}
+.rank-2{background:linear-gradient(135deg,#e2e8f0,#94a3b8);color:white;}
+.rank-3{background:linear-gradient(135deg,#d97706,#b45309);color:white;}
+.leader-name{flex:1;font-weight:600;font-size:0.9rem;}
+.leader-pts{font-weight:800;color:#10b981;font-size:0.92rem;}
+
+.activity-list{max-height:300px;overflow-y:auto;}
+.act-item{display:flex;align-items:center;gap:0.85rem;padding:0.8rem;background:#f8fafc;border-radius:0.75rem;margin-bottom:6px;border-left:4px solid #10b981;}
+.act-pts{font-weight:800;font-size:0.85rem;padding:4px 10px;border-radius:99px;background:#d1fae5;color:#059669;margin-left:auto;white-space:nowrap;}
+.act-pts.neg{background:#fee2e2;color:#dc2626;}
+
+/* REDEEM MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:9999;display:none;align-items:center;justify-content:center;}
+.modal-overlay.show{display:flex;}
+.modal-box{background:white;border-radius:1.2rem;padding:2.5rem;max-width:400px;width:90%;text-align:center;animation:popIn 0.35s cubic-bezier(0.175,0.885,0.32,1.275);}
+@keyframes popIn{from{opacity:0;transform:scale(0.8)}to{opacity:1;transform:scale(1)}}
+.modal-icon{font-size:3.5rem;margin-bottom:1rem;}
+.modal-box h3{font-size:1.4rem;font-weight:800;margin:0 0 0.5rem;}
+.modal-box p{color:#64748b;margin:0 0 1.5rem;}
+.voucher-code{background:#f0fdf4;border:2px dashed #10b981;border-radius:0.75rem;padding:1rem;font-size:1.3rem;font-weight:800;color:#059669;letter-spacing:4px;margin-bottom:1.5rem;}
+.modal-btns{display:flex;gap:0.75rem;justify-content:center;}
+
+@media(max-width:900px){.main-grid{grid-template-columns:1fr;}.tier-hero{flex-direction:column;text-align:center;}}
+</style>
+</head>
+<body>
+<div class="modal-overlay" id="redeemModal">
+  <div class="modal-box">
+    <div class="modal-icon">🎉</div>
+    <h3>Reward Redeemed!</h3>
+    <p id="modalRewardName">Your reward has been claimed successfully.</p>
+    <div class="voucher-code" id="voucherCode">ECO-XXXX-XXXX</div>
+    <p style="font-size:0.82rem;color:#94a3b8;">Present this code at participating outlets or use it online.</p>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" onclick="document.getElementById('redeemModal').classList.remove('show')">Close</button>
+      <button class="btn btn-primary" onclick="navigator.clipboard.writeText(document.getElementById('voucherCode').textContent);window.UI.notify('Code copied!','success')">
+        <i class="fas fa-copy"></i> Copy Code
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="user-container">
+  <aside class="user-sidebar"></aside>
+  <main class="user-main">
+    <header class="user-header"></header>
+    <div class="content-wrapper">
+
+      <div class="tier-hero">
+        <div class="tier-badge" id="tierBadge"><i class="fas fa-trophy"></i></div>
+        <div class="tier-info">
+          <h2 id="tierName">Loading Tier...</h2>
+          <p>Your eco-friendly actions are making our city greener! 🌱</p>
+          <div class="progress-bar-wrap"><div class="progress-bar" id="tierBar"></div></div>
+          <div class="progress-labels">
+            <span id="coinsCurrent">0 Coins</span>
+            <span id="coinsNext">Next Tier</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-coins"></i></div>
+          <div><div class="stat-label">Total Coins</div><div class="stat-num" id="totalCoins">–</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#d1fae5;color:#059669;"><i class="fas fa-calendar-check"></i></div>
+          <div><div class="stat-label">Earned This Month</div><div class="stat-num" id="monthCoins">–</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-trophy"></i></div>
+          <div><div class="stat-label">Leaderboard Rank</div><div class="stat-num" id="myRank">#–</div></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#ede9fe;color:#7c3aed;"><i class="fas fa-gift"></i></div>
+          <div><div class="stat-label">Rewards Redeemed</div><div class="stat-num" id="redeemedCount">–</div></div>
+        </div>
+      </div>
+
+      <div class="main-grid">
+        <div class="section-box">
+          <div class="section-title"><i class="fas fa-gift"></i> Redeem Rewards</div>
+          <div id="rewardsList"><p style="color:#94a3b8;text-align:center;padding:1rem;">Loading rewards...</p></div>
+        </div>
+        <div class="section-box">
+          <div class="section-title"><i class="fas fa-trophy"></i> Top Eco Citizens</div>
+          <div id="leaderPreview"></div>
+          <a href="leaderboard.html" class="btn btn-primary" style="width:100%;justify-content:center;margin-top:1rem;">View Full Leaderboard</a>
+        </div>
+      </div>
+
+      <div class="section-box">
+        <div class="section-title"><i class="fas fa-history"></i> Recent Activity</div>
+        <div class="activity-list" id="activityList"><p style="color:#94a3b8;text-align:center;padding:1rem;font-size:0.85rem;">Loading activity...</p></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="../config.js"></script>
+    <script src="../script.js"></script>
+<script>
+const TIERS=[
+  {name:'🥉 Bronze',min:0,icon:'fa-medal',color:'#cd7f32'},
+  {name:'🥈 Silver',min:500,icon:'fa-award',color:'#94a3b8'},
+  {name:'🥇 Gold',min:1000,icon:'fa-trophy',color:'#fbbf24'},
+  {name:'💎 Platinum',min:2000,icon:'fa-crown',color:'#818cf8'},
+  {name:'🔷 Diamond',min:5000,icon:'fa-gem',color:'#38bdf8'},
+];
+const FALLBACK_REWARDS=[
+  {id:1,name:'10% Off Eco Store Voucher',coinsNeeded:300,description:'Valid at all partner eco stores'},
+  {id:2,name:'Free Bus Pass (1 Day)',coinsNeeded:500,description:'For any city route'},
+  {id:3,name:'Home Compost Kit',coinsNeeded:800,description:'Organic composting starter kit'},
+  {id:4,name:'Tree Planting Certificate',coinsNeeded:2000,description:'Plant a tree in your name'},
+  {id:5,name:'EcoSmart Premium Badge',coinsNeeded:3000,description:'Exclusive digital recognition'},
+];
+const FALLBACK_ACTS=[
+  {desc:'Reported Bin Overflow',time:'Today, 10:30 AM',pts:20},
+  {desc:'Recycled 5kg E-Waste',time:'Yesterday',pts:50},
+  {desc:'Community Cleanup Event',time:'2 days ago',pts:100},
+  {desc:'Redeemed Bus Pass',time:'Last week',pts:-500},
+];
+
+function makeVoucher(){return 'ECO-'+Math.random().toString(36).substring(2,6).toUpperCase()+'-'+Math.random().toString(36).substring(2,6).toUpperCase();}
+
+async function redeemReward(id,cost,name){
+  if(!confirm(`Redeem "${name}" for ${cost} Eco Coins?`))return;
+  try{
+    await window.API.redeemReward(id);
+    showRedeemModal(name);
+  }catch(e){
+    // Demo fallback
+    showRedeemModal(name);
+    window.UI.notify('Demo: In production coins will be deducted','info');
+  }
+}
+function showRedeemModal(name){
+  document.getElementById('modalRewardName').textContent=name;
+  document.getElementById('voucherCode').textContent=makeVoucher();
+  document.getElementById('redeemModal').classList.add('show');
+}
+
+document.addEventListener('DOMContentLoaded',async()=>{
+  let coins=0,userId=null;
+  try{
+    const u=await window.API.getProfile();
+    coins=u.ecoCoins||0;
+    userId=u.id;
+    document.getElementById('totalCoins').textContent=coins.toLocaleString();
+    document.getElementById('coinsCurrent').textContent=`${coins} Coins`;
+    document.getElementById('monthCoins').textContent=Math.floor(coins*0.4).toLocaleString();
+  }catch(e){
+    coins=750;
+    document.getElementById('totalCoins').textContent='750';
+    document.getElementById('coinsCurrent').textContent='750 Coins';
+    document.getElementById('monthCoins').textContent='300';
+  }
+
+  // Tier
+  const tier=TIERS.slice().reverse().find(t=>coins>=t.min)||TIERS[0];
+  const nextTier=TIERS.find(t=>t.min>coins);
+  document.getElementById('tierName').textContent=tier.name+' Member';
+  document.querySelector('#tierBadge i').className=`fas ${tier.icon}`;
+  document.querySelector('#tierBadge').style.color=tier.color;
+  if(nextTier){
+    document.getElementById('coinsNext').textContent=`${nextTier.min} for ${nextTier.name}`;
+    const pct=Math.min(((coins-tier.min)/(nextTier.min-tier.min))*100,100);
+    setTimeout(()=>document.getElementById('tierBar').style.width=`${pct}%`,300);
+  } else {
+    document.getElementById('coinsNext').textContent='Max Tier Reached! 🏆';
+    setTimeout(()=>document.getElementById('tierBar').style.width='100%',300);
+  }
+
+  // Leaderboard
+  try{
+    const lb=await window.API.getLeaderboard();
+    const rank=lb.findIndex(u=>u.id===userId)+1;
+    document.getElementById('myRank').textContent=rank>0?`#${rank}`:'#–';
+    document.getElementById('leaderPreview').innerHTML=lb.slice(0,8).map((u,i)=>`
+      <div class="leader-row ${u.id===userId?'me':''}">
+        <div class="rank-badge rank-${i<3?i+1:''}">${i+1}</div>
+        <div class="leader-name">${u.name||'Citizen'}</div>
+        <div class="leader-pts">${(u.ecoCoins||0).toLocaleString()} pts</div>
+      </div>`).join('');
+  }catch(e){
+    document.getElementById('myRank').textContent='#–';
+    document.getElementById('leaderPreview').innerHTML='<p style="color:#94a3b8;text-align:center;font-size:0.85rem;padding:1rem;">Connect backend for live data.</p>';
+  }
+
+  // Rewards
+  let rewards=FALLBACK_REWARDS;
+  try{rewards=await window.API.getRewards()||FALLBACK_REWARDS;}catch(e){}
+  document.getElementById('rewardsList').innerHTML=rewards.map(r=>`
+    <div class="reward-card ${coins<r.coinsNeeded?'locked':''}">
+      <div class="reward-icon-wrap"><i class="fas fa-gift"></i></div>
+      <div class="reward-info">
+        <h4>${r.name}</h4>
+        <div class="reward-cost"><i class="fas fa-coins"></i> ${r.coinsNeeded} Coins</div>
+      </div>
+      <button class="redeem-btn" ${coins<r.coinsNeeded?'disabled':''} onclick="redeemReward(${r.id},${r.coinsNeeded},'${r.name.replace(/'/g,"\\'")}')">
+        ${coins<r.coinsNeeded?'🔒 Locked':'Redeem'}
+      </button>
+    </div>`).join('');
+  document.getElementById('redeemedCount').textContent='0';
+
+  // Activity
+  document.getElementById('activityList').innerHTML=FALLBACK_ACTS.map(a=>`
+    <div class="act-item">
+      <i class="fas ${a.pts>0?'fa-check-circle':'fa-shopping-cart'}" style="color:#64748b;"></i>
+      <div style="flex:1;"><div style="font-weight:600;font-size:0.88rem;">${a.desc}</div><div style="color:#94a3b8;font-size:0.78rem;">${a.time}</div></div>
+      <div class="act-pts ${a.pts<0?'neg':''}">${a.pts>0?'+':''}${a.pts}</div>
+    </div>`).join('');
+});
+</script>
+</body>
+</html>

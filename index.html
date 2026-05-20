@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoSmart | Gateway to Sustainable City</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+         :root {
+            --primary: #10b981;
+            --primary-dark: #064e3b;
+            --primary-light: #34d399;
+            --secondary: #3b82f6;
+            --accent: #f59e0b;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.08);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, #020617 0%, #0f1929 50%, #020617 100%);
+            color: var(--light);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+        
+        .bg-glow {
+            position: fixed;
+            width: 800px;
+            height: 800px;
+            border-radius: 50%;
+            filter: blur(120px);
+            z-index: 0;
+            animation: float 25s infinite ease-in-out;
+        }
+        
+        .glow-1 {
+            top: -200px;
+            left: -200px;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, transparent 70%);
+        }
+        
+        .glow-2 {
+            bottom: -300px;
+            right: -200px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.25) 0%, transparent 70%);
+            animation-delay: -12s;
+        }
+        
+        .glow-3 {
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, transparent 70%);
+            animation-delay: -6s;
+        }
+        
+        @keyframes float {
+            0%,
+            100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(30px, -30px) scale(1.05);
+            }
+            66% {
+                transform: translate(-20px, 20px) scale(0.95);
+            }
+        }
+        
+        .floating-leaves {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        .leaf {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.15;
+            animation: leafFall linear infinite;
+        }
+        
+        @keyframes leafFall {
+            0% {
+                transform: translateY(-100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.15;
+            }
+            90% {
+                opacity: 0.15;
+            }
+            100% {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .gateway-container {
+            width: 100%;
+            max-width: 1200px;
+            padding: 2rem;
+            z-index: 10;
+            position: relative;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-top: 2rem;
+        }
+        
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 16px;
+            background: linear-gradient(135deg, #fff 0%, #10b981 50%, #34d399 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: fadeInUp 0.8s ease-out, logoGlow 3s ease-in-out infinite;
+        }
+        
+        .logo i {
+            font-size: 3rem;
+            -webkit-text-fill-color: #10b981;
+            animation: leafSway 3s ease-in-out infinite;
+            filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.4));
+        }
+        
+        @keyframes leafSway {
+            0%,
+            100% {
+                transform: rotate(-5deg);
+            }
+            50% {
+                transform: rotate(5deg);
+            }
+        }
+        
+        @keyframes logoGlow {
+            0%,
+            100% {
+                filter: drop-shadow(0 0 0px rgba(16, 185, 129, 0));
+            }
+            50% {
+                filter: drop-shadow(0 0 20px rgba(16, 185, 129, 0.5));
+            }
+        }
+        
+        .tagline {
+            font-size: 1.3rem;
+            color: #94a3b8;
+            max-width: 650px;
+            margin: 0 auto 1.5rem;
+            line-height: 1.6;
+            animation: fadeInUp 0.8s ease-out 0.2s backwards;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .eco-stats {
+            display: flex;
+            justify-content: center;
+            gap: 3rem;
+            margin-bottom: 3rem;
+            animation: fadeInUp 0.8s ease-out 0.4s backwards;
+            flex-wrap: wrap;
+        }
+        
+        .eco-stat {
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 1rem;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            transition: var(--transition);
+        }
+        
+        .eco-stat:hover {
+            background: rgba(16, 185, 129, 0.1);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.2);
+        }
+        
+        .eco-stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary-light);
+            background: linear-gradient(135deg, #10b981, #34d399);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .eco-stat-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .portal-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2.5rem;
+            margin-top: 2rem;
+        }
+        
+        .portal-option {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(16, 185, 129, 0.05) 100%);
+            border: 1.5px solid rgba(255, 255, 255, 0.1);
+            padding: 3rem 2.5rem;
+            border-radius: 2rem;
+            text-decoration: none;
+            color: white;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            backdrop-filter: blur(20px);
+            animation: fadeInUp 0.8s ease-out backwards;
+        }
+        
+        .portal-option:nth-child(1) {
+            animation-delay: 0.5s;
+        }
+        
+        .portal-option:nth-child(2) {
+            animation-delay: 0.7s;
+        }
+        
+        .portal-option::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-light), var(--primary));
+            transform: scaleX(0);
+            transition: transform 0.5s ease;
+            z-index: 1;
+        }
+        
+        .portal-option:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .portal-option:hover {
+            transform: translateY(-12px) scale(1.02);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(16, 185, 129, 0.1) 100%);
+            border-color: var(--primary);
+            box-shadow: 0 25px 60px -12px rgba(16, 185, 129, 0.3), inset 0 0 30px rgba(16, 185, 129, 0.1);
+        }
+        
+        .icon-box {
+            width: 110px;
+            height: 110px;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%);
+            border-radius: 1.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+            color: var(--primary);
+            position: relative;
+            border: 1.5px solid rgba(16, 185, 129, 0.2);
+        }
+        
+        .icon-box::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            background: linear-gradient(135deg, transparent 0%, rgba(16, 185, 129, 0.2) 100%);
+            opacity: 0;
+            transition: var(--transition);
+        }
+        
+        .portal-option:hover .icon-box {
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            color: var(--dark);
+            transform: rotate(8deg) scale(1.15);
+            box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4);
+            border-color: var(--primary-light);
+        }
+        
+        .portal-option:hover .icon-box::after {
+            opacity: 1;
+        }
+        
+        .portal-option h2 {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--light), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .portal-option p {
+            color: #94a3b8;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+        
+        .btn-portal {
+            padding: 0.9rem 2.5rem;
+            border-radius: 1rem;
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+            transition: var(--transition);
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-portal::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--primary);
+            z-index: -1;
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+            transform-origin: left;
+        }
+        
+        .portal-option:hover .btn-portal::before {
+            transform: scaleX(1);
+        }
+        
+        .portal-option:hover .btn-portal {
+            color: var(--dark);
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+        }
+        
+        .features-strip {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 4rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(16, 185, 129, 0.05) 100%);
+            border-radius: 1.5rem;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            animation: fadeInUp 0.8s ease-out 0.9s backwards;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: 0.75rem;
+        }
+        
+        .feature-item:hover {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--primary-light);
+        }
+        
+        .feature-item i {
+            color: var(--primary);
+            font-size: 1.2rem;
+            transition: var(--transition);
+        }
+        
+        .feature-item:hover i {
+            transform: scale(1.2) rotate(10deg);
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @media (max-width: 900px) {
+            .portal-grid {
+                grid-template-columns: 1fr;
+                max-width: 500px;
+                margin: 2rem auto 0;
+            }
+            .logo {
+                font-size: 2.5rem;
+            }
+            .eco-stats {
+                gap: 2rem;
+                flex-wrap: wrap;
+            }
+            .features-strip {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            .gateway-container {
+                padding: 1rem;
+            }
+            .header {
+                margin-bottom: 2rem;
+            }
+        }
+        
+        @media (max-width: 600px) {
+            .logo {
+                font-size: 2rem;
+            }
+            .tagline {
+                font-size: 1.1rem;
+            }
+            .eco-stats {
+                gap: 1rem;
+            }
+            .eco-stat {
+                padding: 1rem;
+            }
+            .portal-option {
+                padding: 2rem 1.5rem;
+            }
+            .features-strip {
+                padding: 1.5rem;
+                gap: 1rem;
+            }
+            .feature-item {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="bg-glow glow-1"></div>
+    <div class="bg-glow glow-2"></div>
+    <div class="bg-glow glow-3"></div>
+
+    <div class="floating-leaves" id="leavesContainer"></div>
+
+    <div class="gateway-container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-leaf"></i> EcoSmart
+            </div>
+            <p class="tagline">Transforming urban waste management through technology. Join thousands of citizens building cleaner, greener communities.</p>
+        </div>
+
+        <div class="eco-stats">
+            <div class="eco-stat">
+                <div class="eco-stat-value">15K+</div>
+                <div class="eco-stat-label">Active Citizens</div>
+            </div>
+            <div class="eco-stat">
+                <div class="eco-stat-value">500+</div>
+                <div class="eco-stat-label">Smart Bins</div>
+            </div>
+            <div class="eco-stat">
+                <div class="eco-stat-value">98%</div>
+                <div class="eco-stat-label">Collection Rate</div>
+            </div>
+            <div class="eco-stat">
+                <div class="eco-stat-value">50T</div>
+                <div class="eco-stat-label">Waste Recycled</div>
+            </div>
+        </div>
+
+        <div class="portal-grid">
+            <a href="user/login.html" class="portal-option">
+                <div class="icon-box">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h2>Citizen Portal</h2>
+                <p>Report waste issues, track collection trucks in real-time, earn eco-rewards, and contribute to a cleaner neighborhood.</p>
+                <span class="btn-portal">Enter Portal</span>
+            </a>
+
+            <a href="admin/admin-login.html" class="portal-option" style="border-color: rgba(59, 130, 246, 0.3);">
+                <div class="icon-box" style="color: var(--secondary);">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h2>Admin Panel</h2>
+                <p>Manage fleet operations, monitor smart bins, resolve complaints, and optimize city-wide waste management.</p>
+                <span class="btn-portal" style="border-color: var(--secondary); color: var(--secondary);">Management Login</span>
+            </a>
+        </div>
+
+        <div class="features-strip">
+            <div class="feature-item">
+                <i class="fas fa-map-marked-alt"></i>
+                <span>Live GPS Tracking</span>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-coins"></i>
+                <span>Eco Rewards</span>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-recycle"></i>
+                <span>Waste Marketplace</span>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-bell"></i>
+                <span>Smart Alerts</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('leavesContainer');
+            const leafEmojis = ['🍃', '🌿', '☘️', '🍀'];
+            for (let i = 0; i < 8; i++) {
+                const leaf = document.createElement('div');
+                leaf.className = 'leaf';
+                leaf.textContent = leafEmojis[Math.floor(Math.random() * leafEmojis.length)];
+                leaf.style.left = Math.random() * 100 + '%';
+                leaf.style.animationDuration = (15 + Math.random() * 20) + 's';
+                leaf.style.animationDelay = Math.random() * 15 + 's';
+                leaf.style.fontSize = (1.5 + Math.random() * 1.5) + 'rem';
+                container.appendChild(leaf);
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Request Extra Truck | EcoSmart</title>
+<meta name="description" content="Request an extra garbage truck for special waste collection events, bulk waste removal, or emergency pickups.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+
+.content-wrapper{padding:1.75rem 2rem;flex:1;}
+.page-hero{background:linear-gradient(135deg,#1e3a5f,#3b82f6);border-radius:1rem;padding:1.75rem 2rem;color:white;margin-bottom:1.5rem;}
+.page-hero h1{margin:0 0 0.3rem;font-size:1.6rem;font-weight:800;}
+.page-hero p{margin:0;opacity:0.9;font-size:0.9rem;}
+
+.layout{display:grid;grid-template-columns:1fr 340px;gap:1.5rem;}
+.form-card{background:white;border-radius:1rem;padding:2rem;border:1px solid #e2e8f0;}
+.form-title{font-size:1.05rem;font-weight:700;color:#1e293b;margin:0 0 1.5rem;display:flex;align-items:center;gap:8px;}
+.form-title i{color:#3b82f6;}
+.form-grp{margin-bottom:1.1rem;}
+.form-grp label{display:block;font-weight:600;font-size:0.85rem;color:#374151;margin-bottom:0.4rem;}
+.form-grp input,.form-grp select,.form-grp textarea{width:100%;padding:0.7rem 1rem;border:1.5px solid #e2e8f0;border-radius:9px;font-size:0.92rem;font-family:inherit;background:#f8fafc;box-sizing:border-box;transition:all 0.2s;}
+.form-grp input:focus,.form-grp select:focus,.form-grp textarea:focus{outline:none;border-color:#3b82f6;background:white;box-shadow:0 0 0 3px rgba(59,130,246,0.1);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+
+.waste-type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;margin-bottom:1.1rem;}
+.wt-opt{border:1.5px solid #e2e8f0;border-radius:0.75rem;padding:0.75rem 0.5rem;text-align:center;cursor:pointer;transition:all 0.2s;background:#f8fafc;}
+.wt-opt:hover{border-color:#3b82f6;background:#eff6ff;}
+.wt-opt.sel{border-color:#3b82f6;background:#dbeafe;color:#1e40af;}
+.wt-opt i{font-size:1.4rem;margin-bottom:0.3rem;display:block;}
+.wt-opt span{font-size:0.72rem;font-weight:600;}
+
+.submit-btn{width:100%;padding:0.9rem;border:none;border-radius:0.75rem;background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.25s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(59,130,246,0.3);}
+
+.side-panel{display:flex;flex-direction:column;gap:1.25rem;}
+.my-requests{background:white;border-radius:1rem;border:1px solid #e2e8f0;overflow:hidden;}
+.my-req-header{padding:1rem 1.25rem;border-bottom:1px solid #f1f5f9;font-size:0.92rem;font-weight:700;color:#1e293b;}
+.req-item{display:flex;align-items:center;gap:0.75rem;padding:0.85rem 1.1rem;border-bottom:1px solid #f1f5f9;}
+.req-item:last-child{border-bottom:none;}
+.req-icon{width:36px;height:36px;border-radius:9px;background:#dbeafe;color:#2563eb;display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;}
+.req-info{flex:1;}
+.req-info h4{margin:0 0 2px;font-size:0.85rem;font-weight:700;}
+.req-info p{margin:0;font-size:0.75rem;color:#64748b;}
+
+.status-tracker{background:white;border-radius:1rem;padding:1.25rem;border:1px solid #e2e8f0;}
+.status-tracker h4{font-size:0.88rem;font-weight:700;color:#1e293b;margin:0 0 1rem;}
+.track-step{display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;}
+.track-dot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:800;flex-shrink:0;}
+.track-done{background:#10b981;color:white;}
+.track-active{background:#3b82f6;color:white;animation:pulse 1.5s infinite;}
+.track-pending{background:#f1f5f9;color:#94a3b8;}
+.track-info h5{margin:0 0 1px;font-size:0.82rem;font-weight:700;}
+.track-info p{margin:0;font-size:0.72rem;color:#94a3b8;}
+
+@media(max-width:1000px){.layout{grid-template-columns:1fr;}}
+@media(max-width:640px){.form-row{grid-template-columns:1fr;}.waste-type-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<div class="user-container">
+  <aside class="user-sidebar"></aside>
+  <main class="user-main">
+    <header class="user-header"></header>
+    <div class="content-wrapper">
+
+      <div class="page-hero">
+        <h1><i class="fas fa-truck-loading"></i> Request Extra Garbage Truck</h1>
+        <p>Need an extra collection? Events, bulk waste, or emergency pickups — we're here to help!</p>
+      </div>
+
+      <div class="layout">
+        <div class="form-card">
+          <div class="form-title"><i class="fas fa-clipboard-list"></i> Request Details</div>
+          <form id="truckForm">
+            <div class="form-grp">
+              <label>Request Title *</label>
+              <input type="text" id="reqTitle" placeholder="e.g. Community event waste cleanup" required>
+            </div>
+            <div class="form-grp">
+              <label>Type of Waste *</label>
+              <div class="waste-type-grid">
+                <div class="wt-opt" data-type="Household Waste" onclick="selectWaste(this)"><i class="fas fa-home" style="color:#64748b;"></i><span>Household</span></div>
+                <div class="wt-opt" data-type="Construction Debris" onclick="selectWaste(this)"><i class="fas fa-hard-hat" style="color:#d97706;"></i><span>Construction</span></div>
+                <div class="wt-opt" data-type="Garden Waste" onclick="selectWaste(this)"><i class="fas fa-leaf" style="color:#10b981;"></i><span>Garden</span></div>
+                <div class="wt-opt" data-type="Bulk/Heavy Waste" onclick="selectWaste(this)"><i class="fas fa-boxes" style="color:#3b82f6;"></i><span>Bulk/Heavy</span></div>
+                <div class="wt-opt" data-type="Event Waste" onclick="selectWaste(this)"><i class="fas fa-users" style="color:#8b5cf6;"></i><span>Event Waste</span></div>
+                <div class="wt-opt" data-type="Other" onclick="selectWaste(this)"><i class="fas fa-question" style="color:#94a3b8;"></i><span>Other</span></div>
+              </div>
+              <input type="hidden" id="wasteType">
+            </div>
+            <div class="form-grp">
+              <label>Description / Notes *</label>
+              <textarea id="reqDesc" rows="3" placeholder="Describe the waste, estimated quantity, special requirements..." required></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-grp">
+                <label>Pickup Location *</label>
+                <input type="text" id="reqLoc" placeholder="e.g. Sector 14 Community Hall" required>
+              </div>
+              <div class="form-grp">
+                <label>Priority</label>
+                <select id="reqPriority">
+                  <option value="LOW">🟢 Low — Within a week</option>
+                  <option value="MEDIUM" selected>🟡 Medium — Within 2 days</option>
+                  <option value="HIGH">🔴 High — Today/Tomorrow</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-grp">
+                <label>Preferred Date</label>
+                <input type="date" id="reqDate" min="${new Date().toISOString().split('T')[0]}">
+              </div>
+              <div class="form-grp">
+                <label>Preferred Time</label>
+                <select id="reqTime">
+                  <option value="Morning (7–10 AM)">Morning (7–10 AM)</option>
+                  <option value="Midday (10 AM–1 PM)">Midday (10 AM–1 PM)</option>
+                  <option value="Afternoon (1–5 PM)">Afternoon (1–5 PM)</option>
+                  <option value="Evening (5–8 PM)">Evening (5–8 PM)</option>
+                </select>
+              </div>
+            </div>
+            <button type="submit" class="submit-btn"><i class="fas fa-paper-plane"></i> Submit Request</button>
+          </form>
+        </div>
+
+        <div class="side-panel">
+          <div class="status-tracker">
+            <h4><i class="fas fa-route" style="color:#3b82f6;margin-right:6px;"></i>Request Lifecycle</h4>
+            <div class="track-step"><div class="track-dot track-done"><i class="fas fa-check"></i></div><div class="track-info"><h5>Request Submitted</h5><p>Sent to admin instantly</p></div></div>
+            <div class="track-step"><div class="track-dot track-active">2</div><div class="track-info"><h5>Under Review</h5><p>Admin assigning team</p></div></div>
+            <div class="track-step"><div class="track-dot track-pending">3</div><div class="track-info"><h5>Approved & Scheduled</h5><p>Truck assigned & ETA set</p></div></div>
+            <div class="track-step"><div class="track-dot track-pending">4</div><div class="track-info"><h5>Truck Dispatched</h5><p>Track live on map</p></div></div>
+            <div class="track-step"><div class="track-dot track-pending" style="margin-bottom:0;"><i class="fas fa-check"></i></div><div class="track-info"><h5>Completed</h5><p>+50 eco coins awarded</p></div></div>
+          </div>
+
+          <div class="my-requests">
+            <div class="my-req-header"><i class="fas fa-history" style="color:#3b82f6;margin-right:6px;"></i>My Past Requests</div>
+            <div id="myReqList"><p style="text-align:center;color:#94a3b8;padding:1.5rem;font-size:0.85rem;">Loading...</p></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="../config.js"></script>
+    <script src="../script.js"></script>
+<script>
+let selectedWaste='';
+function selectWaste(el){
+  document.querySelectorAll('.wt-opt').forEach(o=>o.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedWaste=el.dataset.type;
+  document.getElementById('wasteType').value=selectedWaste;
+}
+
+document.getElementById('truckForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!selectedWaste){window.UI.notify('Please select waste type','warning');return;}
+  const btn=e.target.querySelector('.submit-btn');
+  btn.innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Submitting...';btn.disabled=true;
+  try{
+    await window.API.createTruckRequest({
+      title:document.getElementById('reqTitle').value,
+      description:document.getElementById('reqDesc').value+' | Waste Type: '+selectedWaste,
+      location:document.getElementById('reqLoc').value,
+      priority:document.getElementById('reqPriority').value,
+      preferredDate:document.getElementById('reqDate').value?new Date(document.getElementById('reqDate').value).toISOString():null,
+      preferredTime:document.getElementById('reqTime').value,
+    });
+    window.UI.notify('Truck request submitted! Admin will respond within 2 hours. 🚛','success');
+    e.target.reset();selectedWaste='';document.querySelectorAll('.wt-opt').forEach(o=>o.classList.remove('sel'));
+    loadMyRequests();
+  }catch(err){window.UI.notify('Request submitted in demo mode. Connect backend for live processing.','info');}
+  btn.innerHTML='<i class="fas fa-paper-plane"></i> Submit Request';btn.disabled=false;
+});
+
+async function loadMyRequests(){
+  try{
+    const reqs=await window.API.getMyTruckRequests();
+    const list=document.getElementById('myReqList');
+    if(!reqs||!reqs.length){list.innerHTML='<p style="text-align:center;color:#94a3b8;padding:1.5rem;font-size:0.85rem;">No requests yet.</p>';return;}
+    list.innerHTML=reqs.slice(0,4).map(r=>`
+      <div class="req-item">
+        <div class="req-icon"><i class="fas fa-truck-loading"></i></div>
+        <div class="req-info"><h4>${r.title}</h4><p>📍 ${r.location} | ${window.fmtDate(r.createdAt)}</p></div>
+        <span class="badge badge-${r.status.toLowerCase()}" style="white-space:nowrap;">${r.status}</span>
+      </div>`).join('');
+  }catch(e){document.getElementById('myReqList').innerHTML='<p style="text-align:center;color:#94a3b8;padding:1.5rem;font-size:0.85rem;">Connect backend for live data.</p>';}
+}
+
+document.addEventListener('DOMContentLoaded',loadMyRequests);
+</script>
+</body>
+</html>

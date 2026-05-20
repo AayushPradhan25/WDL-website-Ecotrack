@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dustbins Management | Admin Panel | Eco Smart</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+
+    <style>
+        /* --- CSS Variables --- */
+        
+         :root {
+            --primary-green: #2e7d5e;
+            --bg-light: #f3f4f6;
+            --sidebar-dark: #111827;
+            --sidebar-hover: #1f2937;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        /* --- Global Reset & Layout --- */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* --- Sidebar --- */
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .sidebar-header i {
+            color: var(--primary-green);
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex-grow: 1;
+        }
+        
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-nav a i {
+            width: 24px;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background-color: var(--sidebar-hover);
+            color: var(--white);
+            border-left-color: var(--primary-green);
+        }
+        /* --- Main Content & Top Bar --- */
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .logout-btn {
+            background-color: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .logout-btn:hover {
+            background-color: #ef4444;
+            color: var(--white);
+        }
+        
+        .content-wrapper {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        /* --- Controls & Layout --- */
+        
+        .page-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background-color: #1a533d;
+            box-shadow: 0 4px 12px rgba(46, 125, 94, 0.2);
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+        
+        .table-controls {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            background-color: #f8fafc;
+        }
+        
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 250px;
+            max-width: 400px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        
+        .search-box input:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(46, 125, 94, 0.15);
+        }
+        
+        .filter-box select {
+            padding: 0.6rem 2.5rem 0.6rem 1rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            background-color: var(--white);
+            cursor: pointer;
+            color: var(--text-dark);
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.75rem center;
+            background-size: 1rem;
+        }
+        
+        .filter-box select:focus {
+            border-color: var(--primary-green);
+        }
+        /* --- Data Table --- */
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        
+        .data-table th {
+            background-color: var(--white);
+            padding: 1rem 1.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .data-table td {
+            padding: 1rem 1.5rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .data-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        
+        .data-table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+        /* --- Dustbin Specific Styling --- */
+        
+        .location-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .location-info i {
+            color: #94a3b8;
+        }
+        
+        .capacity-pill {
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #475569;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        
+        .badge {
+            padding: 0.35rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: capitalize;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .badge-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        /* Active, Empty, Good */
+        
+        .badge-warning {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        /* Maintenance, Medium */
+        
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        /* Full, Damaged */
+        
+        .badge-neutral {
+            background-color: #f3f4f6;
+            color: #4b5563;
+        }
+        /* --- Action Buttons --- */
+        
+        .action-btns {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .btn-icon {
+            width: 34px;
+            height: 34px;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 6px;
+            text-decoration: none;
+            transition: var(--transition);
+            font-size: 0.9rem;
+        }
+        
+        .btn-edit {
+            background-color: #fffbeb;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+        
+        .btn-edit:hover {
+            background-color: #d97706;
+            color: white;
+        }
+        
+        .empty-state {
+            padding: 3rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        /* Mobile Adjustments */
+        
+        @media (max-width: 768px) {
+
+            .page-header-actions {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .table-controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .search-box {
+                max-width: 100%;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="admin-sidebar"></aside>
+
+        <main class="admin-main">
+            <header class="admin-top-bar"></header>
+
+            <div class="content-wrapper">
+
+                <div class="page-header-actions">
+                    <p style="color: var(--text-muted);">Monitor and manage smart dustbin locations and fill levels.</p>
+                    <a href="add-dustbin.html" class="btn btn-primary">
+                        <i class="fas fa-plus"></i> Add Dustbin
+                    </a>
+                </div>
+
+                <div class="card">
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchDustbins" placeholder="Search by location or ID...">
+                        </div>
+                        <div class="filter-box">
+                            <select id="filterStatus">
+                                <option value="all">All Statuses</option>
+                                <option value="active">Active / Normal</option>
+                                <option value="full">Full / Critical</option>
+                                <option value="maintenance">Maintenance</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Location</th>
+                                    <th>Capacity</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dustbinsTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Safely fall back to an empty array if mockData is missing
+            const allDustbins = (window.mockData && window.mockData.dustbins) ? window.mockData.dustbins : [];
+            const tbody = document.getElementById('dustbinsTable');
+            const searchInput = document.getElementById('searchDustbins');
+            const statusFilter = document.getElementById('filterStatus');
+
+            // Helper to determine badge styling based on status
+            const getStatusBadge = (status) => {
+                const s = status.toLowerCase();
+                if (s.includes('active') || s.includes('normal') || s.includes('empty')) {
+                    return {
+                        class: 'badge-active',
+                        icon: 'fa-check-circle'
+                    };
+                }
+                if (s.includes('full') || s.includes('overflowing') || s.includes('damaged')) {
+                    return {
+                        class: 'badge-danger',
+                        icon: 'fa-exclamation-triangle'
+                    };
+                }
+                if (s.includes('maintenance')) {
+                    return {
+                        class: 'badge-warning',
+                        icon: 'fa-tools'
+                    };
+                }
+                return {
+                    class: 'badge-neutral',
+                    icon: 'fa-info-circle'
+                }; // Default fallback
+            };
+
+            const renderTable = (dustbinsToRender) => {
+                if (dustbinsToRender.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="empty-state"><i class="fas fa-trash-slash" style="font-size: 2rem; margin-bottom: 1rem; display: block; color: #cbd5e1;"></i>No dustbins found matching your criteria.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = dustbinsToRender.map(d => {
+                    const badge = getStatusBadge(d.status);
+
+                    return `
+                        <tr>
+                            <td style="color: var(--text-muted); font-weight: 500;">#${d.id}</td>
+                            <td>
+                                <span class="location-info">
+                                    <i class="fas fa-map-marker-alt"></i> ${d.location}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="capacity-pill">
+                                    <i class="fas fa-weight-hanging" style="color: #94a3b8;"></i> ${d.capacity}
+                                </span>
+                            </td>
+                            <td>
+                                <span class="badge ${badge.class}">
+                                    <i class="fas ${badge.icon}"></i> ${d.status}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-btns">
+                                    <a href="edit-dustbin.html?id=${d.id}" class="btn-icon btn-edit" title="Edit / Delete Settings">
+                                        <i class="fas fa-cog"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            };
+
+            // Initial Render
+            renderTable(allDustbins);
+
+            // Search and Filter Logic
+            const filterData = () => {
+                const searchTerm = searchInput.value.toLowerCase();
+                const statusTerm = statusFilter.value.toLowerCase();
+
+                const filtered = allDustbins.filter(d => {
+                    const matchesSearch = d.location.toLowerCase().includes(searchTerm) ||
+                        d.id.toString().includes(searchTerm);
+
+                    let matchesStatus = true;
+                    if (statusTerm !== 'all') {
+                        const binStatus = d.status.toLowerCase();
+                        if (statusTerm === 'active') matchesStatus = binStatus.includes('active') || binStatus.includes('normal') || binStatus.includes('empty');
+                        if (statusTerm === 'full') matchesStatus = binStatus.includes('full') || binStatus.includes('overflowing') || binStatus.includes('damaged');
+                        if (statusTerm === 'maintenance') matchesStatus = binStatus.includes('maintenance');
+                    }
+
+                    return matchesSearch && matchesStatus;
+                });
+
+                renderTable(filtered);
+            };
+
+            // Event Listeners for filters
+            searchInput.addEventListener('input', filterData);
+            statusFilter.addEventListener('change', filterData);
+        });
+    </script>
+</body>
+
+</html>

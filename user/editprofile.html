@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile | Eco Smart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+         :root {
+            --primary: #1a4d2e;
+            --primary-dark: #123721;
+            --primary-light: #2e7d5e;
+            --accent: #4caf50;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --radius-lg: 16px;
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .dashboard-container {
+            display: flex;
+            width: 100%;
+        }
+        
+        .sidebar {
+            width: 260px;
+            background: var(--primary-dark);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            margin-left: 260px;
+        }
+        
+        .top-bar {
+            background: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1.5rem;
+            margin: 1.5rem 2rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .profile-setup-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+        
+        .avatar-upload-section {
+            text-align: center;
+            padding: 2rem;
+            background: #f0fdf4;
+            border-radius: var(--radius-lg);
+            border: 2px dashed var(--border);
+        }
+        
+        .profile-preview-img {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: var(--shadow);
+            margin-bottom: 1rem;
+        }
+        
+        .form-section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--bg-main);
+        }
+        
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.8rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 77, 46, 0.1);
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+            font-family: 'Outfit', sans-serif;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text-main);
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        @media (max-width: 768px) {
+            .profile-setup-grid {
+                grid-template-columns: 1fr;
+            }
+            .sidebar {
+                width: 260px;
+            }
+            .main-content {
+                margin-left: 260px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="user-container">
+  <aside class="user-sidebar"></aside>
+  <main class="user-main">
+    <header class="user-header"></header>
+    <div class="content-wrapper">
+      <div class="dashboard-container">
+        
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <a href="profile.html" class="btn btn-secondary" style="padding: 8px;">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <h1>Account Settings</h1>
+                </div>
+                <button class="btn btn-danger" onclick="Auth.logout('user')">Logout</button>
+            </header>
+
+            <div class="card">
+                <form id="editProfileForm" class="profile-setup-grid">
+
+                    <div class="avatar-upload-section">
+                        <img id="avatarPreview" src="" alt="Profile" class="profile-preview-img">
+                        <div class="form-group">
+                            <label for="avatarUrl" class="btn btn-secondary" style="cursor: pointer; width: 100%;">
+                                <i class="fas fa-camera"></i> Change Photo
+                            </label>
+                            <input type="text" id="avatarUrl" placeholder="Enter Image URL" class="form-input" style="margin-top: 10px; font-size: 0.8rem;">
+                        </div>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin-top: 1rem;">
+                            Update your profile picture to help our collection crew identify your household.
+                        </p>
+                    </div>
+
+                    <div>
+                        <div class="form-section-title">Personal Information</div>
+
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="editName" class="form-input" required placeholder="Emma Watson">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="editEmail" class="form-input" required placeholder="emma@example.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Primary Collection Address</label>
+                            <textarea id="editAddress" class="form-input" rows="3" placeholder="Enter your home address..."></textarea>
+                        </div>
+
+                        <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+                            <button type="submit" class="btn btn-primary" style="padding: 0.8rem 2rem;">
+                                <i class="fas fa-save"></i> Save Profile
+                            </button>
+                            <a href="profile.html" class="btn btn-secondary" style="padding: 0.8rem 2rem;">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card" style="border: 1px solid #fee2e2; margin-top: 2rem;">
+                <div class="form-section-title" style="color: var(--danger); border-bottom-color: #fee2e2;">Security & Data</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <p style="font-weight: 600; margin-bottom: 0.2rem;">Download My Eco-Data</p>
+                        <p style="font-size: 0.85rem; color: var(--text-muted);">Get a copy of your recycling history and points.</p>
+                    </div>
+                    <button class="btn btn-secondary">Request Export</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const user = window.ecoState.currentUser;
+
+            // Populate Fields
+            const nameInput = document.getElementById('editName');
+            const emailInput = document.getElementById('editEmail');
+            const avatarInput = document.getElementById('avatarUrl');
+            const avatarPreview = document.getElementById('avatarPreview');
+
+            nameInput.value = user.name;
+            emailInput.value = user.email;
+            avatarInput.value = user.avatar;
+            avatarPreview.src = user.avatar;
+
+            // Live Preview for Avatar URL
+            avatarInput.addEventListener('input', (e) => {
+                avatarPreview.src = e.target.value || 'https://ui-avatars.com/api/?name=User';
+            });
+
+            // Form Submission
+            document.getElementById('editProfileForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                // Update Central State
+                window.ecoState.currentUser.name = nameInput.value;
+                window.ecoState.currentUser.email = emailInput.value;
+                window.ecoState.currentUser.avatar = avatarInput.value;
+
+                // Save to LocalStorage using our Core Engine
+                localStorage.setItem('eco_smart_data', JSON.stringify(window.ecoState));
+
+                // Notify User
+                const btn = e.target.querySelector('button[type="submit"]');
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    alert('Profile updated successfully!');
+                    window.location.href = 'profile.html';
+                }, 800);
+            });
+        });
+    </script>
+    </div>
+  </main>
+</div>
+</body>
+
+</html>

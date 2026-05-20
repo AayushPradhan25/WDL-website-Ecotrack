@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Report Dustbin Issue | Eco Smart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .form-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-main);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 1rem;
+            color: var(--text-main);
+            transition: var(--transition);
+            background: #f8fafc;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(46, 125, 94, 0.1);
+            background: white;
+        }
+        
+        .form-control:read-only {
+            background: #e2e8f0;
+            cursor: not-allowed;
+            color: #64748b;
+            font-weight: 600;
+        }
+        /* Severity Selector */
+        
+        .severity-options {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .severity-label {
+            flex: 1;
+            text-align: center;
+            padding: 0.8rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: var(--transition);
+            background: #f8fafc;
+        }
+        
+        .severity-radio {
+            display: none;
+        }
+        
+        .severity-radio:checked+.severity-label[for="sevLow"] {
+            background: #eefdf3;
+            border-color: var(--success);
+            color: var(--success);
+        }
+        
+        .severity-radio:checked+.severity-label[for="sevMedium"] {
+            background: #fffbeb;
+            border-color: #f59e0b;
+            color: #d97706;
+        }
+        
+        .severity-radio:checked+.severity-label[for="sevHigh"] {
+            background: #fef2f2;
+            border-color: var(--danger);
+            color: var(--danger);
+        }
+        /* Context Card */
+        
+        .bin-context-card {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: var(--radius-lg);
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .bin-context-card h3 {
+            color: white;
+            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+        }
+        
+        @media (max-width: 968px) {
+            .form-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div style="padding: 1rem; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-leaf" style="font-size: 1.5rem; color: var(--accent);"></i>
+                <h2 style="font-size: 1.2rem;">Eco Smart</h2>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div>
+                    <h1>Report Dustbin Issue</h1>
+                    <p style="color: var(--text-muted);">Alert the maintenance team about a specific smart bin</p>
+                </div>
+                <button class="btn btn-danger" onclick="Auth.logout('user')">Logout</button>
+            </header>
+
+            <button onclick="history.back()" class="btn btn-secondary" style="margin-bottom: 1.5rem; display: inline-flex; align-items: center; gap: 5px; background: none; border: none; padding: 0;">
+                <i class="fas fa-arrow-left"></i> Back
+            </button>
+
+            <div class="form-layout">
+                <div class="card">
+                    <form id="reportForm">
+                        <div class="form-group">
+                            <label class="form-label">Target Dustbin ID</label>
+                            <input type="text" id="binIdInput" class="form-control" placeholder="Enter Bin ID (e.g., BIN-104)" required>
+                            <small style="color: var(--text-muted); margin-top: 5px; display: block;">
+                                <i class="fas fa-info-circle"></i> This is usually auto-filled if you clicked 'Report' from the map.
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Issue Type <span style="color:red">*</span></label>
+                            <select class="form-control" required>
+                                <option value="" disabled selected>Select the primary issue...</option>
+                                <option value="overflow">Bin is Overflowing</option>
+                                <option value="damage">Physical Damage / Vandalism</option>
+                                <option value="sensor">Sensor Incorrect / Offline</option>
+                                <option value="hygiene">Severe Odor / Hygiene Issue</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Severity Level</label>
+                            <div class="severity-options">
+                                <div>
+                                    <input type="radio" name="severity" id="sevLow" class="severity-radio" value="low" checked>
+                                    <label for="sevLow" class="severity-label">Low</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="severity" id="sevMedium" class="severity-radio" value="medium">
+                                    <label for="sevMedium" class="severity-label">Medium</label>
+                                </div>
+                                <div>
+                                    <input type="radio" name="severity" id="sevHigh" class="severity-radio" value="high">
+                                    <label for="sevHigh" class="severity-label">High</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Additional Details <span style="color:red">*</span></label>
+                            <textarea class="form-control" rows="4" placeholder="Describe the issue in detail..." required></textarea>
+                        </div>
+
+                        <hr style="border:0; border-top: 1px solid var(--border); margin: 1.5rem 0;">
+
+                        <div style="display: flex; justify-content: flex-end; gap: 1rem;">
+                            <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-exclamation-circle"></i> Submit Report
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div>
+                    <div class="bin-context-card" id="binContextCard" style="display: none;">
+                        <h3><i class="fas fa-trash-alt"></i> Selected Bin</h3>
+                        <div style="font-size: 0.9rem; margin-top: 0.8rem; line-height: 1.6;">
+                            <div><strong>ID:</strong> <span id="contextBinId">--</span></div>
+                            <div><strong>Location:</strong> <span id="contextBinLocation">--</span></div>
+                            <div><strong>Current Status:</strong> <span id="contextBinStatus">--</span></div>
+                        </div>
+                    </div>
+
+                    <div class="card" style="background: #f8fafc; border: none;">
+                        <h4 style="margin-bottom: 0.8rem; font-size: 1rem; color: var(--text-main);">Earn Eco Points!</h4>
+                        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 0;">
+                            Did you know? Reporting verified hardware issues on our smart bins earns you <strong>+20 Eco Points</strong> towards your next reward tier. Thank you for keeping our city clean!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('reportForm');
+            const submitBtn = document.getElementById('submitBtn');
+            const binIdInput = document.getElementById('binIdInput');
+            const contextCard = document.getElementById('binContextCard');
+
+            // 1. Check for Bin ID in URL (e.g., report-dustbin-issue.html?binId=104)
+            const urlParams = new URLSearchParams(window.location.search);
+            const passedBinId = urlParams.get('binId') || urlParams.get('id');
+
+            if (passedBinId) {
+                // Auto-fill and lock the input
+                binIdInput.value = `BIN-${passedBinId}`;
+                binIdInput.readOnly = true;
+
+                // Attempt to fetch mock data for context
+                const mockBins = window.ecoState ? dustbins || [{
+                    id: 104,
+                    location: "Market Square",
+                    fillLevel: 95
+                }] : [];
+
+                const foundBin = mockBins.find(b => b.id == passedBinId);
+
+                if (foundBin) {
+                    document.getElementById('contextBinId').innerText = `BIN-${foundBin.id}`;
+                    document.getElementById('contextBinLocation').innerText = foundBin.location;
+                    document.getElementById('contextBinStatus').innerText = `${foundBin.fillLevel || 0}% Full`;
+                    contextCard.style.display = 'block';
+                }
+            }
+
+            // 2. Form Submission UX
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+                // Simulate network request
+                setTimeout(() => {
+                    submitBtn.style.background = 'var(--success)';
+                    submitBtn.style.borderColor = 'var(--success)';
+                    submitBtn.innerHTML = '<i class="fas fa-check"></i> Report Sent!';
+
+                    setTimeout(() => {
+                        // Navigate back to the previous page (likely the map or bin details)
+                        history.back();
+                    }, 1500);
+                }, 1200);
+            });
+        });
+    </script>
+</body>
+
+</html>

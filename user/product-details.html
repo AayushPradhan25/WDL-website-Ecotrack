@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details | Eco Smart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Product Layout Grid */
+        
+        .product-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 3rem;
+            margin-top: 1rem;
+        }
+        /* Image Gallery Simulation */
+        
+        .product-image-container {
+            background: #f8fafc;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 450px;
+            position: relative;
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .condition-badge {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(4px);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            box-shadow: var(--shadow);
+            color: var(--text-main);
+        }
+        /* Product Info Typography */
+        
+        .product-title {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            line-height: 1.2;
+        }
+        
+        .product-price {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .product-description {
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 2rem;
+            font-size: 1.05rem;
+        }
+        /* Seller Card */
+        
+        .seller-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+        
+        .seller-card:hover {
+            border-color: var(--primary-light);
+            box-shadow: var(--shadow);
+        }
+        
+        .seller-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: #64748b;
+        }
+        /* Tags */
+        
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .eco-tag {
+            background: #eefdf3;
+            color: var(--primary);
+            padding: 0.4rem 0.8rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        /* Breadcrumb */
+        
+        .breadcrumb {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            transition: var(--transition);
+        }
+        
+        .breadcrumb:hover {
+            color: var(--primary);
+        }
+        /* Error State */
+        
+        .not-found-state {
+            text-align: center;
+            padding: 5rem 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+        }
+        
+        @media (max-width: 968px) {
+            .product-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .product-image-container {
+                height: 350px;
+            }
+        }
+
+        </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div style="padding: 1rem; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-leaf" style="font-size: 1.5rem; color: var(--accent);"></i>
+                <h2 style="font-size: 1.2rem;">Eco Smart</h2>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div>
+                    <h1>Marketplace</h1>
+                    <p style="color: var(--text-muted);">Buy and sell recycled goods</p>
+                </div>
+                <button class="btn btn-danger" onclick="Auth.logout('user')">Logout</button>
+            </header>
+
+            <a href="browse-listings.html" class="breadcrumb">
+                <i class="fas fa-arrow-left"></i> Back to Listings
+            </a>
+
+            <div id="productContainer">
+            </div>
+        </main>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+                    // Helper function to safely get URL params
+                    const getQueryParam = (param) => {
+                        const urlParams = new URLSearchParams(window.location.search);
+                        return urlParams.get(param);
+                    };
+
+                    const container = document.getElementById('productContainer');
+                    const productId = getQueryParam('id');
+
+                    // Fallback Mock Data in case core state isn't loaded
+                    const mockListings = window.ecoState ? listings || [{
+                        id: '1',
+                        title: 'Upcycled Wooden Coffee Table',
+                        description: 'Beautiful coffee table made entirely from reclaimed pallet wood. Finished with eco-friendly, non-toxic varnish. Perfect for a rustic or modern living room.',
+                        price: 450,
+                        seller: 'Aarav Sharma',
+                        rating: 4.8,
+                        image: 'https://images.unsplash.com/photo-1533090481728-8b5949a2624e?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80',
+                        condition: 'Refurbished',
+                        tags: ['Wood', 'Upcycled', 'Furniture']
+                    }] : []
+
+                    // Find product or use mock if no ID is provided (for demo purposes)
+                    const product = productId ?
+                        mockListings.find(l => l.id == productId) :
+                        mockListings[0];
+
+                    // 1. Handle "Not Found" State
+                    if (!product) {
+                        container.innerHTML = `
+                    <div class="not-found-state">
+                        <i class="fas fa-box-open" style="font-size: 4rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                        <h2>Product Not Found</h2>
+                        <p style="color: var(--text-muted); margin-bottom: 1.5rem;">The item you are looking for may have been sold or removed.</p>
+                        <a href="browse-listings.html" class="btn btn-primary" style="display: inline-flex; justify-content: center;">Browse other items</a>
+                    </div>
+                `;
+                        return;
+                    }
+
+                    // 2. Render Product Details
+                    const imageSrc = product.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(product.title)}&background=f1f5f9&color=64748b&size=512`;
+                    const condition = product.condition || 'Gently Used';
+
+                    container.innerHTML = `
+                <div class="product-layout">
+                    <div>
+                        <div class="product-image-container">
+                            <span class="condition-badge">${condition}</span>
+                            <img src="${imageSrc}" alt="${product.title}" class="product-image">
+                        </div>
+                    </div>
+
+                    <div>
+                        <h1 class="product-title">${product.title}</h1>
+                        
+                        <div class="product-price">
+                            <i class="fas fa-coins" style="color: #f59e0b;"></i>
+                            ${product.price}
+                        </div>
+
+                        <div class="tag-list">
+                            ${(product.tags || ['Recycled', 'Eco-Friendly']).map(tag => `
+                                <span class="eco-tag"><i class="fas fa-tag"></i> ${tag}</span>
+                            `).join('')}
+                        </div>
+
+                        <div class="product-description">
+                            ${product.description}
+                        </div>
+
+                        <h3 style="font-size: 1rem; color: var(--text-main); margin-bottom: 0.8rem;">About the Seller</h3>
+                        <div class="seller-card">
+                            <div class="seller-avatar">
+                                ${product.seller.charAt(0)}
+                            </div>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 700; font-size: 1.1rem;">${product.seller}</div>
+                                <div style="color: #f59e0b; font-size: 0.9rem; margin-top: 0.2rem;">
+                                    <i class="fas fa-star"></i> ${product.rating || '4.5'} 
+                                    <span style="color: var(--text-muted); margin-left: 5px;">(Verified Seller)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div style="display: flex; gap: 1rem;">
+                            <button id="contactSellerBtn" class="btn btn-primary" style="flex: 2; justify-content: center; font-size: 1.1rem; padding: 1rem;">
+                                <i class="fas fa-comment-dots"></i> Message Seller
+                            </button>
+                            <button id="saveItemBtn" class="btn btn-secondary" style="flex: 1; justify-content: center; font-size: 1.1rem; padding: 1rem;">
+                                <i class="far fa-heart"></i> Save
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            // 3. Attach UI Interactions
+            document.getElementById('contactSellerBtn').addEventListener('click', function() {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Request Sent';
+                this.classList.add('badge-success');
+                this.style.background = 'var(--success)';
+                this.style.borderColor = 'var(--success)';
+                
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                    this.style.background = '';
+                    this.style.borderColor = '';
+                }, 3000);
+            });
+
+            document.getElementById('saveItemBtn').addEventListener('click', function() {
+                const icon = this.querySelector('i');
+                if (icon.classList.contains('far')) {
+                    icon.classList.replace('far', 'fas');
+                    icon.style.color = '#ef4444'; // Red heart
+                } else {
+                    icon.classList.replace('fas', 'far');
+                    icon.style.color = '';
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

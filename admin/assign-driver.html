@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assign Driver | Admin Panel | Eco Smart</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+
+    <style>
+        /* --- CSS Variables --- */
+        
+         :root {
+            --primary-green: #2e7d5e;
+            --bg-light: #f3f4f6;
+            --sidebar-dark: #111827;
+            --sidebar-hover: #1f2937;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        /* --- Global Reset & Layout --- */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* --- Sidebar --- */
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .sidebar-header i {
+            color: var(--primary-green);
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex-grow: 1;
+        }
+        
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-nav a i {
+            width: 24px;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background-color: var(--sidebar-hover);
+            color: var(--white);
+            border-left-color: var(--primary-green);
+        }
+        /* --- Main Content & Top Bar --- */
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logout-btn {
+            background-color: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .logout-btn:hover {
+            background-color: #ef4444;
+            color: var(--white);
+        }
+        
+        .content-wrapper {
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        /* --- Buttons --- */
+        
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-back:hover {
+            color: var(--primary-green);
+        }
+        
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background-color: #1a533d;
+            box-shadow: 0 4px 12px rgba(46, 125, 94, 0.2);
+            transform: translateY(-1px);
+        }
+        /* --- Cards & Form --- */
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .context-info {
+            background-color: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .context-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #e0f2fe;
+            color: #0284c7;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .context-text h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-dark);
+        }
+        
+        .context-text p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .license-plate {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 700;
+            background-color: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            letter-spacing: 1px;
+            color: #334155;
+            margin-left: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background-color: var(--white);
+            transition: var(--transition);
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(46, 125, 94, 0.15);
+        }
+        
+        input[type="text"]:focus+i,
+        .input-wrapper:focus-within i {
+            color: var(--primary-green);
+        }
+        /* --- Toast Notification --- */
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--text-dark);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 3000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast i {
+            color: #10b981;
+        }
+        /* Error State */
+        
+        .error-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="admin-sidebar"></aside>
+
+        <main class="admin-main">
+            <header class="admin-top-bar"></header>
+
+            <div class="content-wrapper">
+                <a href="trucks.html" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Fleet</a>
+
+                <div id="assignContainer">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast" id="toastNotification">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMsg">Driver assigned successfully!</span>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const truckId = urlParams.get('id');
+            const container = document.getElementById('assignContainer');
+
+            // Safely fetch truck from mock data
+            const allTrucks = (window.mockData && window.mockData.trucks) ? window.mockData.trucks : [];
+            const truck = allTrucks.find(t => t.id == truckId);
+
+            if (truck) {
+                // Determine if a driver is currently assigned
+                const currentDriver = truck.driver && truck.driver.trim() !== '' ? truck.driver : '';
+                const driverStatusText = currentDriver ? `Current Driver: <strong>${currentDriver}</strong>` : 'Currently Unassigned';
+
+                container.innerHTML = `
+                    <div class="card">
+                        <div class="context-info">
+                            <div class="context-icon"><i class="fas fa-truck"></i></div>
+                            <div class="context-text">
+                                <h3>Target Vehicle: <span class="license-plate">${truck.number}</span></h3>
+                                <p>Vehicle ID #${truck.id} &bull; ${driverStatusText}</p>
+                            </div>
+                        </div>
+
+                        <form id="assignForm">
+                            <div class="form-group">
+                                <label for="driverName">New Driver Name</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-user-tie"></i>
+                                    <input type="text" id="driverName" placeholder="Enter full name" value="${currentDriver}" required autocomplete="off">
+                                </div>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-id-badge"></i> Assign to Vehicle
+                            </button>
+                        </form>
+                    </div>
+                `;
+
+                // Handle Form Submission
+                document.getElementById('assignForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const newDriverName = document.getElementById('driverName').value.trim();
+
+                    // Update the local mock data
+                    truck.driver = newDriverName;
+
+                    // Show Toast Notification instead of alert()
+                    const toast = document.getElementById('toastNotification');
+                    document.getElementById('toastMsg').innerText = `Driver ${newDriverName} assigned to truck ${truck.number}`;
+                    toast.classList.add('show');
+
+                    // Redirect back after a short delay so they see the success message
+                    setTimeout(() => {
+                        window.location.href = 'trucks.html';
+                    }, 1500);
+                });
+
+            } else {
+                // Handle invalid truck ID
+                container.innerHTML = `
+                    <div class="card error-state">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem; color: #cbd5e1;"></i>
+                        <h2>Vehicle Not Found</h2>
+                        <p>We couldn't locate the truck you are trying to assign a driver to.</p>
+                    </div>
+                `;
+            }
+        });
+    </script>
+</body>
+
+</html>

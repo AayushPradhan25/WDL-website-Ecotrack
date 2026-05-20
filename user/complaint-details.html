@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaint Details | EcoSmart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+
+        .content-wrapper {
+            padding: 1.75rem 2rem;
+            flex: 1;
+        }
+        
+        .page-hero {
+            background: linear-gradient(135deg, #064e3b, #10b981);
+            border-radius: 1rem;
+            padding: 1.75rem 2rem;
+            color: white;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .page-hero h1 {
+            margin: 0;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        
+        .detail-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 1.5rem;
+        }
+        
+        .main-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .status-tracker {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        .status-step {
+            text-align: center;
+            flex: 1;
+            z-index: 2;
+        }
+        
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            background: #e2e8f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            color: white;
+        }
+        
+        .status-step.active .step-icon {
+            background: #10b981;
+        }
+        
+        .status-step.completed .step-icon {
+            background: #10b981;
+        }
+        
+        .meta-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            background: #f8fdf4;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .meta-item label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        
+        .meta-item span {
+            font-weight: 600;
+            color: #334155;
+        }
+        
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+        }
+        
+        .info-card {
+            background: white;
+            border-radius: 1rem;
+            padding: 1.4rem;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .info-card h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0 0 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        
+        .info-card h3 i {
+            color: #10b981;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+        
+        @media(max-width:1000px) {
+            .detail-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="user-container">
+        <aside class="user-sidebar"></aside>
+        <main class="user-main">
+            <header class="user-header"></header>
+            <div class="content-wrapper">
+
+                <div class="page-hero">
+                    <a href="complaint-list.html" class="btn btn-secondary" style="padding:0.5rem 1rem;">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                    <h1>Complaint <span id="refId">#--</span></h1>
+                </div>
+
+                <div class="detail-layout">
+                    <div class="main-card">
+                        <div class="details-header">
+                            <div>
+                                <h2 id="complaintTitle" style="margin:0 0 0.5rem;font-size:1.2rem;">Loading...</h2>
+                                <span id="statusBadge" class="badge" style="display:inline-block;padding:0.3rem 0.8rem;border-radius:12px;font-size:0.75rem;font-weight:700;text-transform:uppercase;">PENDING</span>
+                            </div>
+                            <div style="text-align:right;color:#64748b;font-size:0.9rem;">
+                                Filed on <span id="filedDate">--</span>
+                            </div>
+                        </div>
+
+                        <div class="status-tracker">
+                            <div class="status-step completed" id="step-pending">
+                                <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                                <div style="font-size:0.8rem;font-weight:600;">Filed</div>
+                            </div>
+                            <div class="status-step" id="step-in-progress">
+                                <div class="step-icon"><i class="fas fa-tools"></i></div>
+                                <div style="font-size:0.8rem;font-weight:600;">In Progress</div>
+                            </div>
+                            <div class="status-step" id="step-resolved">
+                                <div class="step-icon"><i class="fas fa-check-double"></i></div>
+                                <div style="font-size:0.8rem;font-weight:600;">Resolved</div>
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom:2rem;">
+                            <h3 style="font-size:1rem;margin:0 0 1rem;border-bottom:1px solid #e2e8f0;padding-bottom:0.5rem;">Description</h3>
+                            <p id="complaintDesc" style="line-height:1.6;color:#475569;margin:0;">Loading...</p>
+                        </div>
+
+                        <div class="meta-info">
+                            <div class="meta-item">
+                                <label>Location</label>
+                                <span id="complaintLocation">--</span>
+                            </div>
+                            <div class="meta-item">
+                                <label>Category</label>
+                                <span id="complaintCategory">General</span>
+                            </div>
+                            <div class="meta-item">
+                                <label>Status</label>
+                                <span id="complaintStatus">Pending</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="side-panel">
+                        <div class="info-card">
+                            <h3><i class="fas fa-info-circle"></i> Timeline</h3>
+                            <div style="font-size:0.85rem;line-height:1.8;color:#64748b;">
+                                <div style="margin-bottom:0.75rem;">
+                                    <strong style="color:#1e293b;">📝 Filed</strong><br>
+                                    <span id="timelineFiled">--</span>
+                                </div>
+                                <div id="timelineProgress" style="margin-bottom:0.75rem;display:none;">
+                                    <strong style="color:#f59e0b;">⚙️ In Progress</strong><br>
+                                    <span>Team assigned and working</span>
+                                </div>
+                                <div id="timelineResolved" style="display:none;">
+                                    <strong style="color:#10b981;">✅ Resolved</strong><br>
+                                    <span id="timelineResolvedDate">--</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-card">
+                            <h3><i class="fas fa-lightbulb"></i> Actions</h3>
+                            <button class="btn btn-secondary" style="width:100%;margin-bottom:0.5rem;" onclick="window.UI.notify('Update notification feature coming soon!','info')">
+              <i class="fas fa-bell"></i> Get Updates
+            </button>
+                            <button class="btn btn-secondary" style="width:100%;" onclick="window.location.href='raise-complaint.html'">
+              <i class="fas fa-plus"></i> File Another
+            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async() => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const complaintId = urlParams.get('id');
+
+            if (!complaintId) {
+                window.location.href = 'complaint-list.html';
+                return;
+            }
+
+            try {
+                const c = await window.API.getComplaintById(complaintId);
+
+                // Update UI
+                document.getElementById('refId').innerText = `#${c.id}`;
+                document.getElementById('complaintTitle').innerText = c.title;
+                document.getElementById('complaintDesc').innerText = c.description || "No description provided.";
+                document.getElementById('complaintLocation').innerText = c.location || '--';
+                document.getElementById('complaintCategory').innerText = c.category || 'General';
+                document.getElementById('filedDate').innerText = new Date(c.createdAt).toLocaleDateString('en-IN');
+                document.getElementById('timelineFiled').innerText = new Date(c.createdAt).toLocaleString('en-IN');
+
+                const badge = document.getElementById('statusBadge');
+                badge.innerText = c.status.toUpperCase();
+                badge.style.background = c.status === 'resolved' ? '#d1fae5' : '#fef3c7';
+                badge.style.color = c.status === 'resolved' ? '#065f46' : '#78350f';
+
+                // Update Tracker
+                document.getElementById('step-pending').classList.add('completed');
+                if (c.status === 'in-progress') {
+                    document.getElementById('step-in-progress').classList.add('active');
+                } else if (c.status === 'resolved') {
+                    document.getElementById('step-in-progress').classList.add('completed');
+                    document.getElementById('step-resolved').classList.add('completed');
+                    document.getElementById('timelineProgress').style.display = 'block';
+                    document.getElementById('timelineResolved').style.display = 'block';
+                } else {
+                    document.getElementById('step-pending').classList.add('active');
+                }
+
+            } catch (err) {
+                console.error("Failed to load complaint details:", err);
+                document.querySelector('.main-card').innerHTML = '<div style="text-align:center;padding:2rem;color:#ef4444;"><i class="fas fa-exclamation-circle" style="font-size:2rem;margin-bottom:1rem;display:block;"></i><p>Could not find this complaint.</p><a href="complaint-list.html" class="btn btn-secondary">Go Back</a></div>';
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Dustbin | Admin Panel | Eco Smart</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+
+    <style>
+        /* --- CSS Variables --- */
+        
+         :root {
+            --primary-green: #2e7d5e;
+            --bg-light: #f3f4f6;
+            --sidebar-dark: #111827;
+            --sidebar-hover: #1f2937;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        /* --- Global Reset & Layout --- */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* --- Sidebar --- */
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .sidebar-header i {
+            color: var(--primary-green);
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex-grow: 1;
+        }
+        
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-nav a i {
+            width: 24px;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background-color: var(--sidebar-hover);
+            color: var(--white);
+            border-left-color: var(--primary-green);
+        }
+        /* --- Main Content & Top Bar --- */
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logout-btn {
+            background-color: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .logout-btn:hover {
+            background-color: #ef4444;
+            color: var(--white);
+        }
+        
+        .content-wrapper {
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        /* --- Buttons --- */
+        
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-back:hover {
+            color: var(--primary-green);
+        }
+        
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background-color: #1a533d;
+            box-shadow: 0 4px 12px rgba(46, 125, 94, 0.2);
+            transform: translateY(-1px);
+        }
+        /* --- Card & Form --- */
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            padding: 2.5rem 2rem;
+        }
+        
+        .form-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        
+        .form-header h2 {
+            font-size: 1.5rem;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+        
+        .form-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background-color: var(--white);
+            transition: var(--transition);
+        }
+        
+        input[type="text"]::placeholder {
+            color: #9ca3af;
+            font-weight: 400;
+        }
+        
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.2rem;
+            cursor: pointer;
+        }
+        
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(46, 125, 94, 0.15);
+        }
+        
+        input[type="text"]:focus+i,
+        .input-wrapper:focus-within i {
+            color: var(--primary-green);
+        }
+        /* --- Toast Notification --- */
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--text-dark);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 3000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast i {
+            color: #10b981;
+        }
+        /* Mobile Adjustments */
+        
+        @media (max-width: 768px) {
+
+        }
+
+        </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="admin-sidebar"></aside>
+
+        <main class="admin-main">
+            <header class="admin-top-bar"></header>
+
+            <div class="content-wrapper">
+                <a href="dustbins.html" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dustbins</a>
+
+                <div class="card">
+                    <div class="form-header">
+                        <h2>Register Smart Bin</h2>
+                        <p>Deploy a new smart dustbin to the monitoring network.</p>
+                    </div>
+
+                    <form id="addDustbinForm">
+                        <div class="form-group">
+                            <label for="location">Location / Landmark</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <input type="text" id="location" placeholder="e.g. Central Park North Gate" required autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="capacity">Current Capacity</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-weight-hanging"></i>
+                                <input type="text" id="capacity" placeholder="e.g. 0% or Empty" required autocomplete="off">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="initialStatus">Initial Status</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-info-circle"></i>
+                                <select id="initialStatus">
+                                    <option value="Active" selected>Active / Normal</option>
+                                    <option value="Maintenance">In Maintenance</option>
+                                    <option value="Full">Full / Offline</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus-circle"></i> Deploy Dustbin
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast" id="toastNotification">
+        <i class="fas fa-check-circle"></i>
+        <span>Dustbin successfully added to the network!</span>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('addDustbinForm');
+
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const loc = document.getElementById('location').value.trim();
+                const cap = document.getElementById('capacity').value.trim();
+                const status = document.getElementById('initialStatus').value;
+
+                // Check if addDustbin function exists in your external script.js
+                if (typeof addDustbin === 'function') {
+                    // Call the external function if it's meant to handle standard events
+                    addDustbin(e);
+                } else if (window.mockData && window.mockData.dustbins) {
+                    // Fallback to update mockData locally if addDustbin isn't defined or we overrode it
+                    const newId = window.mockData.dustbins.length > 0 ? Math.max(...window.mockData.dustbins.map(d => d.id)) + 1 : 1;
+                    window.mockData.dustbins.push({
+                        id: newId,
+                        location: loc,
+                        capacity: cap,
+                        status: status
+                    });
+                }
+
+                // Show Success Toast
+                const toast = document.getElementById('toastNotification');
+                toast.classList.add('show');
+
+                // Redirect back to dustbins list after a short delay
+                setTimeout(() => {
+                    window.location.href = 'dustbins.html';
+                }, 1500);
+            });
+        });
+    </script>
+</body>
+
+</html>

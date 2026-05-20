@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Schedules | EcoSmart Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+
+        .content-wrapper {
+            padding: 1.75rem 2rem;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .page-hero {
+            background: linear-gradient(135deg, #064e3b, #10b981);
+            border-radius: 1rem;
+            padding: 1.75rem 2rem;
+            color: white;
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .page-hero h1 {
+            margin: 0 0 0.3rem;
+            font-size: 1.6rem;
+            font-weight: 800;
+        }
+        
+        .page-hero p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 0.9rem;
+        }
+        
+        .action-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn {
+            padding: 0.6rem 1.2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-primary {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #059669;
+        }
+        
+        .schedules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .schedule-card {
+            background: white;
+            border-radius: 1rem;
+            border: 1px solid #e2e8f0;
+            padding: 1.5rem;
+            transition: all 0.2s;
+        }
+        
+        .schedule-card:hover {
+            border-color: #10b981;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.1);
+        }
+        
+        .sched-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .sched-title {
+            font-weight: 700;
+            color: #1e293b;
+            margin: 0;
+        }
+        
+        .sched-day {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 600;
+        }
+        
+        .sched-info {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+        
+        .info-item i {
+            width: 20px;
+            text-align: center;
+            color: #10b981;
+        }
+        
+        .btn-sm {
+            padding: 0.4rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #475569;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+        
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #94a3b8;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            display: block;
+            opacity: 0.3;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal.show {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            margin-bottom: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #64748b;
+            cursor: pointer;
+        }
+        
+        .form-grp {
+            margin-bottom: 1.25rem;
+        }
+        
+        .form-grp label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: #374151;
+            margin-bottom: 0.4rem;
+        }
+        
+        .form-grp input,
+        .form-grp select,
+        .form-grp textarea {
+            width: 100%;
+            padding: 0.7rem 1rem;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 9px;
+            font-size: 0.92rem;
+            font-family: inherit;
+            background: #f8fafc;
+            box-sizing: border-box;
+        }
+        
+        .form-grp input:focus,
+        .form-grp select:focus,
+        .form-grp textarea:focus {
+            outline: none;
+            border-color: #10b981;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="admin-sidebar"></aside>
+        <main class="admin-main">
+            <header class="admin-top-bar"></header>
+            <div class="content-wrapper">
+
+                <div class="page-hero">
+                    <div>
+                        <h1><i class="fas fa-calendar-alt"></i> Manage Schedules</h1>
+                        <p>Create and manage truck collection timetables for different zones</p>
+                    </div>
+                </div>
+
+                <div class="action-bar">
+                    <button class="btn btn-primary" onclick="openAddModal()">
+          <i class="fas fa-plus"></i> Add New Schedule
+        </button>
+                    <button class="btn btn-secondary" onclick="loadSchedules()">
+          <i class="fas fa-sync-alt"></i> Refresh
+        </button>
+                </div>
+
+                <div id="schedulesContainer">
+                    <div class="empty-state">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        <p>Loading schedules...</p>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <div id="scheduleModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle" style="margin:0;font-size:1.2rem;">Add New Schedule</h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <form id="scheduleForm" onsubmit="saveSchedule(event)">
+                <div class="form-grp">
+                    <label>Day of Week *</label>
+                    <select id="dayOfWeek" required>
+          <option value="Monday">Monday</option>
+          <option value="Tuesday">Tuesday</option>
+          <option value="Wednesday">Wednesday</option>
+          <option value="Thursday">Thursday</option>
+          <option value="Friday">Friday</option>
+          <option value="Saturday">Saturday</option>
+          <option value="Sunday">Sunday</option>
+        </select>
+                </div>
+                <div class="form-grp">
+                    <label>Time *</label>
+                    <input type="time" id="time" required>
+                </div>
+                <div class="form-grp">
+                    <label>Location *</label>
+                    <input type="text" id="location" placeholder="e.g. Sector 14" required>
+                </div>
+                <div class="form-grp">
+                    <label>Activity Type *</label>
+                    <select id="activityType" required>
+          <option value="COLLECTION">🚛 Garbage Collection</option>
+          <option value="CLEANING">🧹 Dustbin Cleaning</option>
+          <option value="AREA_CLEAN">🌿 Area Sanitization</option>
+          <option value="SPECIAL">⭐ Special Drive</option>
+        </select>
+                </div>
+                <div class="form-grp">
+                    <label>Truck Number *</label>
+                    <input type="text" id="truckNumber" placeholder="e.g. T-001" required>
+                </div>
+                <div class="form-grp">
+                    <label>Duration (minutes)</label>
+                    <input type="number" id="duration" placeholder="Estimated duration" value="60">
+                </div>
+                <div class="form-grp">
+                    <label>Description</label>
+                    <textarea id="description" rows="3" placeholder="Any special instructions..."></textarea>
+                </div>
+                <div style="display:flex;gap:1rem;">
+                    <button type="submit" class="btn btn-primary" style="flex:1;">Save Schedule</button>
+                    <button type="button" class="btn btn-secondary" style="flex:1;" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        let allSchedules = [];
+        let editingId = null;
+
+        document.addEventListener('DOMContentLoaded', async() => {
+            await loadSchedules();
+        });
+
+        async function loadSchedules() {
+            try {
+                allSchedules = await window.API.getSchedules() || [];
+                renderSchedules();
+            } catch (err) {
+                console.error("Failed to load schedules:", err);
+                document.getElementById('schedulesContainer').innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-exclamation-circle"></i>
+                <p>Error loading schedules. Please try again.</p>
+            </div>
+        `;
+            }
+        }
+
+        function renderSchedules() {
+            const container = document.getElementById('schedulesContainer');
+
+            if (!allSchedules || allSchedules.length === 0) {
+                container.innerHTML = `
+            <div class="empty-state">
+                <i class="fas fa-calendar"></i>
+                <p>No schedules created yet. Create one to get started.</p>
+            </div>
+        `;
+                return;
+            }
+
+            container.innerHTML = `
+        <div class="schedules-grid">
+            ${allSchedules.map(sched => `
+                <div class="schedule-card">
+                    <div class="sched-header">
+                        <div>
+                            <h3 class="sched-title">${getActivityLabel(sched.activityType)}</h3>
+                            <div class="sched-day">${sched.dayOfWeek}</div>
+                        </div>
+                    </div>
+                    <div class="sched-info">
+                        <div class="info-item">
+                            <i class="fas fa-clock"></i>
+                            <span>${sched.time}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-map-pin"></i>
+                            <span>${sched.location}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-truck"></i>
+                            <span>Truck ${sched.truckNumber || '--'}</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-hourglass-half"></i>
+                            <span>${sched.duration || 60} minutes</span>
+                        </div>
+                    </div>
+                    <div style="display:flex;gap:0.5rem;">
+                        <button class="btn btn-secondary btn-sm" style="flex:1;" onclick="editSchedule(${sched.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-danger btn-sm" style="flex:1;" onclick="deleteSchedule(${sched.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function getActivityLabel(type) {
+    const map = {
+        'COLLECTION': '🚛 Garbage Collection',
+        'CLEANING': '🧹 Dustbin Cleaning',
+        'AREA_CLEAN': '🌿 Area Sanitization',
+        'SPECIAL': '⭐ Special Drive'
+    };
+    return map[type] || 'Schedule';
+}
+
+function openAddModal() {
+    editingId = null;
+    document.getElementById('modalTitle').textContent = 'Add New Schedule';
+    document.getElementById('scheduleForm').reset();
+    document.getElementById('scheduleModal').classList.add('show');
+}
+
+async function editSchedule(id) {
+    const sched = allSchedules.find(s => s.id === id);
+    if (!sched) return;
+    
+    editingId = id;
+    document.getElementById('modalTitle').textContent = 'Edit Schedule';
+    document.getElementById('dayOfWeek').value = sched.dayOfWeek;
+    document.getElementById('time').value = sched.time;
+    document.getElementById('location').value = sched.location;
+    document.getElementById('activityType').value = sched.activityType;
+    document.getElementById('truckNumber').value = sched.truckNumber || '';
+    document.getElementById('duration').value = sched.duration || 60;
+    document.getElementById('description').value = sched.description || '';
+    document.getElementById('scheduleModal').classList.add('show');
+}
+
+function closeModal() {
+    document.getElementById('scheduleModal').classList.remove('show');
+    editingId = null;
+}
+
+async function saveSchedule(e) {
+    e.preventDefault();
+    
+    const data = {
+        dayOfWeek: document.getElementById('dayOfWeek').value,
+        time: document.getElementById('time').value,
+        location: document.getElementById('location').value,
+        activityType: document.getElementById('activityType').value,
+        truckNumber: document.getElementById('truckNumber').value,
+        duration: parseInt(document.getElementById('duration').value),
+        description: document.getElementById('description').value,
+        status: 'ACTIVE'
+    };
+
+    try {
+        if (editingId) {
+            await window.API.updateSchedule(editingId, data);
+            window.UI.notify('Schedule updated! ✏️', 'success');
+        } else {
+            await window.API.createSchedule(data);
+            window.UI.notify('Schedule created! 📅', 'success');
+        }
+        closeModal();
+        await loadSchedules();
+    } catch (err) {
+        window.UI.notify('Failed to save schedule', 'error');
+        console.error(err);
+    }
+}
+
+async function deleteSchedule(id) {
+    if (!window.UI.confirm('Delete this schedule?')) return;
+    try {
+        await window.API.deleteSchedule(id);
+        window.UI.notify('Schedule deleted', 'info');
+        await loadSchedules();
+    } catch (err) {
+        window.UI.notify('Failed to delete schedule', 'error');
+    }
+}
+    </script>
+</body>
+
+</html>

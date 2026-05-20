@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard | Admin Panel | Eco Smart</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+
+    <style>
+        /* --- CSS Variables --- */
+        
+         :root {
+            --primary-green: #2e7d5e;
+            --bg-light: #f3f4f6;
+            --sidebar-dark: #111827;
+            --sidebar-hover: #1f2937;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            /* Medal Colors */
+            --gold: #f59e0b;
+            --gold-bg: #fef3c7;
+            --silver: #94a3b8;
+            --silver-bg: #f1f5f9;
+            --bronze: #b45309;
+            --bronze-bg: #ffedd5;
+        }
+        /* --- Global Reset & Layout --- */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* --- Sidebar --- */
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .sidebar-header i {
+            color: var(--primary-green);
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex-grow: 1;
+        }
+        
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-nav a i {
+            width: 24px;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background-color: var(--sidebar-hover);
+            color: var(--white);
+            border-left-color: var(--primary-green);
+        }
+        /* --- Main Content & Top Bar --- */
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logout-btn {
+            background-color: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .logout-btn:hover {
+            background-color: #ef4444;
+            color: var(--white);
+        }
+        
+        .content-wrapper {
+            padding: 2rem;
+            max-width: 900px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        /* --- Controls & Layout --- */
+        
+        .page-header-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .btn-back:hover {
+            color: var(--primary-green);
+        }
+        /* --- Card & Table --- */
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            padding: 1.5rem;
+            background-color: var(--white);
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .table-header h2 {
+            font-size: 1.1rem;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        
+        .data-table th {
+            background-color: #f8fafc;
+            padding: 1rem 1.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .data-table td {
+            padding: 1rem 1.5rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .data-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        
+        .data-table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+        /* --- Leaderboard Specific Styling --- */
+        
+        .rank-badge {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+        
+        .rank-1 .rank-badge {
+            background-color: var(--gold-bg);
+            color: var(--gold);
+            border: 2px solid #fde68a;
+        }
+        
+        .rank-2 .rank-badge {
+            background-color: var(--silver-bg);
+            color: var(--silver);
+            border: 2px solid #e2e8f0;
+        }
+        
+        .rank-3 .rank-badge {
+            background-color: var(--bronze-bg);
+            color: var(--bronze);
+            border: 2px solid #fed7aa;
+        }
+        
+        .rank-other .rank-badge {
+            background-color: #f3f4f6;
+            color: #6b7280;
+        }
+        /* Highlight Top 3 Rows slightly */
+        
+        .data-table tbody tr.rank-1 {
+            background-color: rgba(254, 243, 199, 0.2);
+        }
+        
+        .data-table tbody tr.rank-2 {
+            background-color: rgba(241, 245, 249, 0.4);
+        }
+        
+        .data-table tbody tr.rank-3 {
+            background-color: rgba(255, 237, 213, 0.2);
+        }
+        
+        .data-table tbody tr.rank-1:hover,
+        .data-table tbody tr.rank-2:hover,
+        .data-table tbody tr.rank-3:hover {
+            background-color: #f9fafb;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 500;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: var(--primary-green);
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .points-pill {
+            background-color: #ecfdf5;
+            color: #059669;
+            padding: 0.35rem 0.85rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        /* Mobile Adjustments */
+        
+        @media (max-width: 768px) {
+
+        }
+
+        </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="admin-sidebar"></aside>
+
+        <main class="admin-main">
+            <header class="admin-top-bar"></header>
+
+            <div class="content-wrapper">
+
+                <div class="page-header-actions">
+                    <p style="color: var(--text-muted);">View the top contributors to the Eco Smart network based on reward points.</p>
+                    <a href="rewards.html" class="btn-back">
+                        <i class="fas fa-arrow-left"></i> Back to Reward Rules
+                    </a>
+                </div>
+
+                <div class="card">
+                    <div class="table-header">
+                        <h2><i class="fas fa-trophy" style="color: var(--gold);"></i> Global Rankings</h2>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 100px; text-align: center;">Rank</th>
+                                    <th>Eco Smart User</th>
+                                    <th style="text-align: right;">Total Points</th>
+                                </tr>
+                            </thead>
+                            <tbody id="leaderboardTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mock Leaderboard Data
+            const leaderboardData = [{
+                rank: 1,
+                name: "Aarav Sharma",
+                points: 3420
+            }, {
+                rank: 2,
+                name: "Priya Mehta",
+                points: 2980
+            }, {
+                rank: 3,
+                name: "Rohan Verma",
+                points: 2750
+            }, {
+                rank: 4,
+                name: "Neha Gupta",
+                points: 2410
+            }, {
+                rank: 5,
+                name: "Vikram Singh",
+                points: 2100
+            }];
+
+            const tbody = document.getElementById('leaderboardTable');
+
+            // Helper to get user initials for the avatar
+            const getInitials = (name) => {
+                const parts = name.split(' ');
+                if (parts.length >= 2) {
+                    return `${parts[0][0]}${parts[1][0]}`;
+                }
+                return name.substring(0, 2);
+            };
+
+            // Render table
+            tbody.innerHTML = leaderboardData.map(user => {
+                // Determine row class and medal icon based on rank
+                let rowClass = 'rank-other';
+                let rankDisplay = `<span class="rank-badge">${user.rank}</span>`;
+
+                if (user.rank === 1) {
+                    rowClass = 'rank-1';
+                    rankDisplay = `<span class="rank-badge"><i class="fas fa-trophy"></i></span>`;
+                } else if (user.rank === 2) {
+                    rowClass = 'rank-2';
+                    rankDisplay = `<span class="rank-badge"><i class="fas fa-medal"></i></span>`;
+                } else if (user.rank === 3) {
+                    rowClass = 'rank-3';
+                    rankDisplay = `<span class="rank-badge"><i class="fas fa-award"></i></span>`;
+                }
+
+                return `
+                    <tr class="${rowClass}">
+                        <td style="text-align: center;">
+                            ${rankDisplay}
+                        </td>
+                        <td>
+                            <div class="user-info">
+                                <div class="user-avatar">${getInitials(user.name)}</div>
+                                <span>${user.name}</span>
+                            </div>
+                        </td>
+                        <td style="text-align: right;">
+                            <span class="points-pill">
+                                <i class="fas fa-star"></i> ${user.points.toLocaleString()}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        });
+    </script>
+</body>
+
+</html>

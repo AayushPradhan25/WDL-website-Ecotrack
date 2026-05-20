@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dustbin Details | Eco Smart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .bin-visual-container {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            margin: 2rem 0;
+            padding: 2rem;
+            background: var(--bg-main);
+            border-radius: var(--radius-lg);
+        }
+        /* Dynamic Fill Gauge */
+        
+        .bin-gauge {
+            width: 100px;
+            height: 150px;
+            border: 4px solid var(--primary);
+            border-radius: 8px 8px 20px 20px;
+            position: relative;
+            overflow: hidden;
+            background: #fff;
+        }
+        
+        .fill-liquid {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            transition: height 1s ease-in-out;
+            background: var(--primary-light);
+        }
+        
+        .fill-liquid.warning {
+            background: var(--warning);
+        }
+        
+        .fill-liquid.critical {
+            background: var(--danger);
+        }
+        
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+            flex: 1;
+        }
+        
+        .info-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            display: block;
+        }
+        
+        .info-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <h2 style="margin-bottom: 2rem;">EcoSmart</h2>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <a href="nearby-dustbins.html" class="btn btn-secondary" style="padding: 8px;">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <h1>Smart Bin Status</h1>
+                </div>
+                <button class="btn btn-danger" onclick="Auth.logout('user')">Logout</button>
+            </header>
+
+            <div class="card" id="binDetails">
+            </div>
+        </main>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const id = getQueryParam('id');
+            const bin = window.ecoState.dustbins.find(d => d.id == id);
+            const container = document.getElementById('binDetails');
+
+            if (!bin) {
+                container.innerHTML = `<h3>Bin not found</h3><a href="nearby-dustbins.html">Back to map</a>`;
+                return;
+            }
+
+            // Determine color class based on fill level
+            let fillClass = '';
+            if (bin.fillLevel > 90) fillClass = 'critical';
+            else if (bin.fillLevel > 70) fillClass = 'warning';
+
+            container.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 style="margin-bottom: 0.25rem;">${bin.location}</h2>
+                        <span class="badge ${bin.status === 'full' ? 'badge-danger' : 'badge-success'}">
+                            ${bin.status.toUpperCase()}
+                        </span>
+                    </div>
+                    <a href="report-issue.html?id=${bin.id}" class="btn btn-secondary">
+                        <i class="fas fa-exclamation-triangle"></i> Report Issue
+                    </a>
+                </div>
+
+                <div class="bin-visual-container">
+                    <div class="bin-gauge">
+                        <div class="fill-liquid ${fillClass}" style="height: ${bin.fillLevel}%"></div>
+                    </div>
+                    <div class="detail-grid">
+                        <div class="info-block">
+                            <span class="info-label">Current Fill</span>
+                            <span class="info-value" style="font-size: 2rem;">${bin.fillLevel}%</span>
+                        </div>
+                        <div class="info-block">
+                            <span class="info-label">Waste Type</span>
+                            <span class="info-value">General / Recyclable</span>
+                        </div>
+                        <div class="info-block">
+                            <span class="info-label">Last Cleared</span>
+                            <span class="info-value">Today, 06:15 AM</span>
+                        </div>
+                        <div class="info-block">
+                            <span class="info-label">Sensor ID</span>
+                            <span class="info-value">#BIN-${bin.id}992</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: #fdf2f2; padding: 1rem; border-radius: 8px; display: flex; gap: 1rem; align-items: center;">
+                    <i class="fas fa-info-circle" style="color: var(--danger);"></i>
+                    <p style="font-size: 0.9rem; margin: 0; color: #991b1b;">
+                        <b>Pro-tip:</b> If the bin is overflowing, please use the report button above to alert the collection crew immediately.
+                    </p>
+                </div>
+            `;
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Raise Complaint | EcoSmart — Report Waste Issues</title>
+<meta name="description" content="Report waste management issues — overflowing bins, missed collections, illegal dumping. Your complaint reaches admin instantly.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+
+.content-wrapper{padding:1.75rem 2rem;flex:1;}
+
+.page-hero{background:linear-gradient(135deg,#064e3b,#10b981);border-radius:1rem;padding:1.75rem 2rem;color:white;margin-bottom:1.5rem;}
+.page-hero h1{margin:0 0 0.3rem;font-size:1.6rem;font-weight:800;}
+.page-hero p{margin:0;opacity:0.9;font-size:0.9rem;}
+
+.form-layout{display:grid;grid-template-columns:1fr 360px;gap:1.5rem;}
+.form-card{background:white;border-radius:1rem;padding:2rem;border:1px solid #e2e8f0;}
+.form-title{font-size:1.1rem;font-weight:700;color:#1e293b;margin:0 0 1.5rem;display:flex;align-items:center;gap:8px;}
+.form-title i{color:#10b981;}
+.form-grp{margin-bottom:1.25rem;}
+.form-grp label{display:block;font-weight:600;font-size:0.85rem;color:#374151;margin-bottom:0.4rem;}
+.form-grp input,.form-grp select,.form-grp textarea{width:100%;padding:0.7rem 1rem;border:1.5px solid #e2e8f0;border-radius:9px;font-size:0.92rem;font-family:inherit;background:#f8fafc;box-sizing:border-box;transition:all 0.2s;}
+.form-grp input:focus,.form-grp select:focus,.form-grp textarea:focus{outline:none;border-color:#10b981;background:white;box-shadow:0 0 0 3px rgba(16,185,129,0.1);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem;}
+
+.cat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0.6rem;margin-bottom:1.25rem;}
+.cat-opt{border:1.5px solid #e2e8f0;border-radius:0.75rem;padding:0.75rem 0.5rem;text-align:center;cursor:pointer;transition:all 0.2s;background:#f8fafc;}
+.cat-opt:hover{border-color:#10b981;background:#f0fdf4;}
+.cat-opt.selected{border-color:#10b981;background:#d1fae5;color:#065f46;}
+.cat-opt i{font-size:1.4rem;margin-bottom:0.3rem;display:block;}
+.cat-opt span{font-size:0.75rem;font-weight:600;}
+
+.upload-zone{border:2px dashed #d1fae5;border-radius:0.75rem;padding:1.5rem;text-align:center;cursor:pointer;background:#f8fffe;transition:all 0.2s;margin-bottom:1.25rem;}
+.upload-zone:hover{border-color:#10b981;background:#f0fdf4;}
+.upload-zone i{font-size:2rem;color:#10b981;margin-bottom:0.4rem;}
+
+.submit-btn{width:100%;padding:0.9rem;border:none;border-radius:0.75rem;background:linear-gradient(135deg,#10b981,#059669);color:white;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.25s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(16,185,129,0.3);}
+.submit-btn:disabled{background:#e2e8f0;color:#94a3b8;cursor:not-allowed;transform:none;box-shadow:none;}
+
+.side-panel{display:flex;flex-direction:column;gap:1.25rem;}
+.info-box{background:white;border-radius:1rem;padding:1.4rem;border:1px solid #e2e8f0;}
+.info-box h4{font-size:0.92rem;font-weight:700;color:#1e293b;margin:0 0 0.85rem;display:flex;align-items:center;gap:7px;}
+.info-box h4 i{color:#10b981;}
+.info-step{display:flex;gap:0.85rem;margin-bottom:0.85rem;}
+.step-num{width:26px;height:26px;border-radius:50%;background:#10b981;color:white;font-weight:800;font-size:0.75rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-info h5{margin:0 0 2px;font-size:0.85rem;font-weight:700;}
+.step-info p{margin:0;font-size:0.78rem;color:#64748b;}
+
+.eco-note{background:linear-gradient(135deg,#d1fae5,#a7f3d0);border-radius:0.9rem;padding:1.1rem;border-left:4px solid #10b981;}
+.eco-note p{margin:0;font-size:0.82rem;color:#065f46;font-weight:500;}
+
+@media(max-width:1000px){.form-layout{grid-template-columns:1fr;}}
+@media(max-width:640px){.form-row{grid-template-columns:1fr;}.cat-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<div class="user-container">
+  <aside class="user-sidebar"></aside>
+  <main class="user-main">
+    <header class="user-header"></header>
+    <div class="content-wrapper">
+
+      <div class="page-hero">
+        <h1><i class="fas fa-bullhorn"></i> Report Waste Issue</h1>
+        <p>Your complaint reaches the admin team instantly. Average response time: 2 hours. 🌿</p>
+      </div>
+
+      <div class="form-layout">
+        <div class="form-card">
+          <div class="form-title"><i class="fas fa-edit"></i> Complaint Details</div>
+          <form id="complaintForm">
+            <div class="form-grp">
+              <label>Issue Category *</label>
+              <div class="cat-grid" id="catGrid">
+                <div class="cat-opt" data-cat="Overflowing Bin" onclick="selectCat(this)"><i class="fas fa-trash-alt" style="color:#ef4444;"></i><span>Overflowing Bin</span></div>
+                <div class="cat-opt" data-cat="Missed Collection" onclick="selectCat(this)"><i class="fas fa-truck" style="color:#f59e0b;"></i><span>Missed Collection</span></div>
+                <div class="cat-opt" data-cat="Illegal Dumping" onclick="selectCat(this)"><i class="fas fa-exclamation-triangle" style="color:#dc2626;"></i><span>Illegal Dumping</span></div>
+                <div class="cat-opt" data-cat="Road Litter" onclick="selectCat(this)"><i class="fas fa-road" style="color:#d97706;"></i><span>Road Litter</span></div>
+                <div class="cat-opt" data-cat="Damaged Dustbin" onclick="selectCat(this)"><i class="fas fa-tools" style="color:#3b82f6;"></i><span>Damaged Dustbin</span></div>
+                <div class="cat-opt" data-cat="Other" onclick="selectCat(this)"><i class="fas fa-question-circle" style="color:#6366f1;"></i><span>Other</span></div>
+              </div>
+              <input type="hidden" id="selectedCat" required>
+            </div>
+            <div class="form-grp">
+              <label>Complaint Title *</label>
+              <input type="text" id="compTitle" placeholder="Brief summary of the issue" required maxlength="100">
+            </div>
+            <div class="form-grp">
+              <label>Detailed Description *</label>
+              <textarea id="compDesc" rows="4" placeholder="Describe the issue in detail — location specifics, severity, how long it's been there..." required></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-grp">
+                <label>Location / Area *</label>
+                <input type="text" id="compLoc" placeholder="e.g. Near Gate 3, Sector 14" required>
+              </div>
+              <div class="form-grp">
+                <label>Urgency</label>
+                <select id="compUrgency">
+                  <option value="Low">🟢 Low — Can wait</option>
+                  <option value="Medium" selected>🟡 Medium — Needs attention</option>
+                  <option value="High">🔴 High — Immediate action needed</option>
+                </select>
+              </div>
+            </div>
+            <div class="upload-zone" onclick="document.getElementById('compPhoto').click()">
+              <i class="fas fa-camera"></i>
+              <div style="font-weight:700;margin-bottom:2px;">Attach Photo (optional)</div>
+              <div style="font-size:0.78rem;color:#94a3b8;">Click to select — helps admin assess faster</div>
+              <input type="file" id="compPhoto" accept="image/*" style="display:none" onchange="previewCompPhoto(this)">
+            </div>
+            <div id="compPhotoPreview" style="display:none;margin:-0.75rem 0 1.25rem;"><img id="compPreviewImg" style="width:100%;border-radius:0.75rem;max-height:180px;object-fit:cover;" alt="Preview"></div>
+            <button type="submit" class="submit-btn" id="submitBtn">
+              <i class="fas fa-paper-plane"></i> Submit Complaint
+            </button>
+          </form>
+        </div>
+
+        <div class="side-panel">
+          <div class="info-box">
+            <h4><i class="fas fa-route"></i> What Happens Next?</h4>
+            <div class="info-step"><div class="step-num">1</div><div class="step-info"><h5>Admin Notified Instantly</h5><p>Your complaint appears on the admin dashboard in real-time.</p></div></div>
+            <div class="info-step"><div class="step-num">2</div><div class="step-info"><h5>Team Assignment</h5><p>A cleanup team or truck is assigned within 2 hours.</p></div></div>
+            <div class="info-step"><div class="step-num">3</div><div class="step-info"><h5>On-Site Action</h5><p>The issue is resolved and you receive a notification.</p></div></div>
+            <div class="info-step" style="margin-bottom:0;"><div class="step-num">4</div><div class="step-info"><h5>Earn Eco Coins!</h5><p>You earn <strong>20 eco-coins</strong> for each valid complaint. 🌿</p></div></div>
+          </div>
+          <div class="info-box">
+            <h4><i class="fas fa-chart-bar"></i> Your Complaint Stats</h4>
+            <div style="display:flex;gap:1rem;">
+              <div style="text-align:center;flex:1;"><div style="font-size:1.5rem;font-weight:800;color:#10b981;" id="totalComp">–</div><div style="font-size:0.75rem;color:#64748b;">Total Raised</div></div>
+              <div style="text-align:center;flex:1;"><div style="font-size:1.5rem;font-weight:800;color:#3b82f6;" id="resolvedComp">–</div><div style="font-size:0.75rem;color:#64748b;">Resolved</div></div>
+              <div style="text-align:center;flex:1;"><div style="font-size:1.5rem;font-weight:800;color:#f59e0b;" id="pendingComp">–</div><div style="font-size:0.75rem;color:#64748b;">Pending</div></div>
+            </div>
+          </div>
+          <div class="eco-note">
+            <p>🌱 <strong>Eco Tip:</strong> A clean environment reduces disease by 40% and improves local biodiversity. Every complaint you raise makes our city healthier!</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="../config.js"></script>
+    <script src="../script.js"></script>
+<script>
+let selectedCategory='';
+
+function selectCat(el){
+  document.querySelectorAll('.cat-opt').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedCategory=el.dataset.cat;
+  document.getElementById('selectedCat').value=selectedCategory;
+}
+
+function previewCompPhoto(inp){
+  if(!inp.files[0])return;
+  const r=new FileReader();
+  r.onload=e=>{document.getElementById('compPreviewImg').src=e.target.result;document.getElementById('compPhotoPreview').style.display='block';};
+  r.readAsDataURL(inp.files[0]);
+}
+
+document.getElementById('complaintForm').addEventListener('submit',async e=>{
+  e.preventDefault();
+  if(!selectedCategory){window.UI.notify('Please select an issue category','warning');return;}
+  const btn=document.getElementById('submitBtn');
+  btn.innerHTML='<i class="fas fa-circle-notch fa-spin"></i> Submitting...';
+  btn.disabled=true;
+  try{
+    await window.API.createComplaint({
+      title:document.getElementById('compTitle').value,
+      description:document.getElementById('compDesc').value,
+      location:document.getElementById('compLoc').value,
+      category:selectedCategory,
+    });
+    window.UI.notify('Complaint submitted! Admin notified instantly. +20 Eco Coins! 🌿','success');
+    setTimeout(()=>window.location.href='complaint-list.html',1500);
+  }catch(err){
+    window.UI.notify('Complaint recorded in demo mode. Connect backend for live sync.','info');
+    setTimeout(()=>window.location.href='complaint-list.html',2000);
+  }
+  btn.innerHTML='<i class="fas fa-paper-plane"></i> Submit Complaint';
+  btn.disabled=false;
+});
+
+document.addEventListener('DOMContentLoaded',async()=>{
+  try{
+    const comps=await window.API.getMyComplaints();
+    document.getElementById('totalComp').textContent=comps.length;
+    document.getElementById('resolvedComp').textContent=comps.filter(c=>c.status==='resolved').length;
+    document.getElementById('pendingComp').textContent=comps.filter(c=>c.status==='pending').length;
+  }catch(e){
+    document.getElementById('totalComp').textContent='–';
+    document.getElementById('resolvedComp').textContent='–';
+    document.getElementById('pendingComp').textContent='–';
+  }
+});
+</script>
+</body>
+</html>

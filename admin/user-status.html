@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage User Access | Admin Panel | Eco Smart</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+
+    <style>
+        /* --- CSS Variables --- */
+        
+         :root {
+            --primary-green: #2e7d5e;
+            --bg-light: #f3f4f6;
+            --sidebar-dark: #111827;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --danger-color: #ef4444;
+            --success-color: #10b981;
+            --modal-overlay: rgba(0, 0, 0, 0.5);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* --- Sidebar & Top Bar --- */
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex-grow: 1;
+        }
+        
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 0.95rem;
+        }
+        
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background-color: #1f2937;
+            color: var(--white);
+            border-left: 4px solid var(--primary-green);
+        }
+        
+        .sidebar-nav a i {
+            width: 24px;
+            margin-right: 0.75rem;
+        }
+
+        .logout-btn {
+            background: transparent;
+            color: var(--danger-color);
+            border: 1px solid var(--danger-color);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .logout-btn:hover {
+            background: var(--danger-color);
+            color: var(--white);
+        }
+        
+        .content-wrapper {
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        /* --- User Card --- */
+        
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-back:hover {
+            color: var(--primary-green);
+        }
+        
+        .card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 2rem;
+            text-align: center;
+            border-top: 4px solid var(--border-color);
+            transition: var(--transition);
+        }
+        
+        .card.active-state {
+            border-top-color: var(--success-color);
+        }
+        
+        .card.banned-state {
+            border-top-color: var(--danger-color);
+        }
+        
+        .avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--bg-light);
+            margin: 0 auto 1rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            color: var(--text-muted);
+        }
+        
+        .user-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .user-email {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+        
+        .badge {
+            padding: 0.5rem 1.25rem;
+            border-radius: 9999px;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.875rem;
+            display: inline-block;
+            margin-bottom: 2rem;
+        }
+        
+        .badge-active {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-banned {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .btn-main {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            border: none;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+        }
+        
+        .btn-ban {
+            background: var(--danger-color);
+        }
+        
+        .btn-ban:hover {
+            background: #dc2626;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+        
+        .btn-restore {
+            background: var(--success-color);
+        }
+        
+        .btn-restore:hover {
+            background: #059669;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        /* --- Custom Modal --- */
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--modal-overlay);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.2s ease;
+            z-index: 2000;
+        }
+        
+        .modal-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .modal {
+            background: var(--white);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.2s ease;
+        }
+        
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+        
+        .modal-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        
+        .modal-icon.warning {
+            color: #f59e0b;
+        }
+        
+        .modal h3 {
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .modal p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .modal-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+        }
+        
+        .modal-btn-cancel {
+            background: var(--bg-light);
+            color: var(--text-dark);
+        }
+        
+        .modal-btn-cancel:hover {
+            background: #e5e7eb;
+        }
+        
+        .modal-btn-confirm {
+            background: var(--primary-green);
+            color: white;
+        }
+        /* --- Toast Notification --- */
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--text-dark);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 3000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast i {
+            color: var(--success-color);
+        }
+
+        </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="admin-sidebar"></aside>
+
+        <main class="admin-main">
+            <header class="admin-top-bar"></header>
+
+            <div class="content-wrapper">
+                <a href="users.html" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Users</a>
+                <div id="accessManagerContainer"></div>
+            </div>
+        </main>
+    </div>
+
+    <div class="modal-overlay" id="confirmModal">
+        <div class="modal">
+            <i class="fas fa-exclamation-triangle modal-icon warning"></i>
+            <h3 id="modalTitle">Confirm Action</h3>
+            <p id="modalDesc">Are you sure you want to proceed?</p>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="modal-btn modal-btn-confirm" id="confirmActionBtn">Yes, Proceed</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toastNotification">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMsg">Status updated successfully!</span>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        // State variables
+        const urlParams = new URLSearchParams(window.location.search);
+        const id = urlParams.get('id');
+        const container = document.getElementById('accessManagerContainer');
+        const allUsers = (window.mockData && window.mockData.users) ? window.mockData.users : [];
+        const user = allUsers.find(u => u.id == id);
+
+        // Modal Elements
+        const modal = document.getElementById('confirmModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const confirmActionBtn = document.getElementById('confirmActionBtn');
+        const toast = document.getElementById('toastNotification');
+
+        const closeModal = () => {
+            modal.classList.remove('show');
+        };
+
+        const showToast = (message) => {
+            document.getElementById('toastMsg').innerText = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        };
+
+        if (user) {
+            const renderUI = () => {
+                const isActive = user.status.toLowerCase() === 'active';
+                const avatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=f3f4f6&color=6b7280&size=128`;
+
+                container.innerHTML = `
+                    <div class="card ${isActive ? 'active-state' : 'banned-state'}">
+                        <img src="${avatarUrl}" class="avatar" alt="${user.name}">
+                        <h2 class="user-name">${user.name}</h2>
+                        <p class="user-email">${user.email}</p>
+                        
+                        <div>
+                            <span class="badge ${isActive ? 'badge-active' : 'badge-banned'}">${user.status}</span>
+                        </div>
+
+                        <button id="toggleBtn" class="btn-main ${isActive ? 'btn-ban' : 'btn-restore'}">
+                            <i class="fas ${isActive ? 'fa-ban' : 'fa-check-circle'}"></i> 
+                            ${isActive ? 'Suspend User Account' : 'Restore User Access'}
+                        </button>
+                    </div>
+                `;
+
+                // Handle Custom Modal Trigger
+                document.getElementById('toggleBtn').addEventListener('click', () => {
+                    modalTitle.innerText = isActive ? 'Suspend Account?' : 'Restore Access?';
+                    modalDesc.innerText = isActive ?
+                        `Are you sure you want to ban ${user.name}? They will be logged out immediately.` :
+                        `Allow ${user.name} to access the platform again?`;
+
+                    confirmActionBtn.className = `modal-btn modal-btn-confirm ${isActive ? 'btn-ban' : 'btn-restore'}`;
+                    modal.classList.add('show');
+                });
+            };
+
+            // Handle Actual Confirmation
+            confirmActionBtn.addEventListener('click', () => {
+                closeModal();
+
+                // Call external script if it exists
+                if (typeof toggleUserStatus === 'function') {
+                    toggleUserStatus(id, user.status);
+                }
+
+                // Update Local State & Re-render
+                const wasActive = user.status.toLowerCase() === 'active';
+                user.status = wasActive ? 'banned' : 'active';
+                renderUI();
+                showToast(`User has been ${wasActive ? 'banned' : 'restored'}.`);
+            });
+
+            // Initial Render
+            renderUI();
+        } else {
+            container.innerHTML = `<div class="card"><p>User not found.</p></div>`;
+        }
+    </script>
+</body>
+
+</html>

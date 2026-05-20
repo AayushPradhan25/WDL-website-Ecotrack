@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard | EcoSmart — Your Green Command Center</title>
+<meta name="description" content="EcoSmart citizen dashboard — track trucks, earn rewards, report waste issues in your city.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="../style.css">
+<style>
+
+.content-wrapper{padding:1.75rem 2rem;flex:1;}
+
+.welcome-banner{background:linear-gradient(135deg,#064e3b 0%,#10b981 60%,#34d399 100%);border-radius:1.2rem;padding:2.2rem 2.5rem;color:white;margin-bottom:1.75rem;position:relative;overflow:hidden;}
+.welcome-banner::after{content:'🌿';position:absolute;right:2rem;top:50%;transform:translateY(-50%);font-size:6rem;opacity:0.15;}
+.welcome-banner h1{font-size:2rem;font-weight:800;margin:0 0 0.4rem;}
+.welcome-banner p{opacity:0.9;margin:0 0 1rem;font-size:0.95rem;}
+.eco-tip{background:rgba(255,255,255,0.15);backdrop-filter:blur(10px);border-radius:0.75rem;padding:0.8rem 1.1rem;font-size:0.88rem;}
+.eco-tip i{margin-right:6px;}
+
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1.25rem;margin-bottom:1.75rem;}
+.stat-item{background:white;padding:1.4rem;border-radius:1rem;box-shadow:0 2px 8px rgba(0,0,0,0.05);display:flex;align-items:center;gap:1rem;border:1px solid #e2e8f0;transition:all 0.25s;}
+.stat-item:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(16,185,129,0.12);border-color:#10b981;}
+.stat-icon{width:50px;height:50px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;}
+.stat-label{font-size:0.75rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;}
+.stat-value{font-size:1.6rem;font-weight:800;color:#1e293b;}
+
+.map-section{margin-bottom:1.75rem;}
+.map-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:0.85rem;}
+.map-header h2{font-size:1.15rem;font-weight:700;color:#1e293b;margin:0;display:flex;align-items:center;gap:8px;}
+.map-header h2 i{color:#10b981;}
+.live-badge{display:inline-flex;align-items:center;gap:5px;background:#d1fae5;color:#059669;padding:5px 12px;border-radius:99px;font-size:0.78rem;font-weight:700;}
+.live-badge::before{content:'';width:7px;height:7px;background:#10b981;border-radius:50%;animation:livePulse 1.4s infinite;}
+#liveMap{height:400px;border-radius:1rem;border:2px solid #d1fae5;box-shadow:0 4px 16px rgba(0,0,0,0.06);}
+
+.quick-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:1rem;margin-bottom:1.75rem;}
+.quick-card{background:white;border-radius:1rem;padding:1.5rem 1rem;text-align:center;text-decoration:none;color:#1e293b;border:1px solid #e2e8f0;transition:all 0.25s;}
+.quick-card:hover{transform:translateY(-5px);border-color:#10b981;background:#f0fdf4;box-shadow:0 8px 20px rgba(16,185,129,0.1);}
+.quick-card i{font-size:1.8rem;color:#10b981;margin-bottom:0.6rem;display:block;}
+.quick-card span{font-weight:600;font-size:0.88rem;}
+
+.updates-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem;}
+.update-card{background:white;border-radius:1rem;padding:1.25rem;border:1px solid #e2e8f0;}
+.update-card h3{font-size:1rem;font-weight:700;color:#1e293b;margin:0 0 1rem;display:flex;align-items:center;gap:7px;}
+.update-card h3 i{color:#10b981;}
+.update-item{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0;border-bottom:1px solid #f1f5f9;font-size:0.85rem;}
+.update-item:last-child{border-bottom:none;}
+@media(max-width:900px){.updates-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="user-container">
+  <aside class="user-sidebar"></aside>
+  <main class="user-main">
+    <header class="user-header"></header>
+    <div class="content-wrapper">
+
+      <div class="welcome-banner">
+        <h1 id="welcomeMsg">🌿 Hello, Eco Citizen!</h1>
+        <p>Your green actions are making our city cleaner and healthier every day.</p>
+        <div class="eco-tip"><i class="fas fa-lightbulb"></i><strong>Eco Tip:</strong> Separate wet and dry waste to earn <strong>2x eco-coins</strong> this week! 🌱</div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat-item">
+          <div class="stat-icon" style="background:#d1fae5;color:#059669;"><i class="fas fa-coins"></i></div>
+          <div><div class="stat-label">Eco Coins</div><div class="stat-value" id="userCoins">–</div></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon" style="background:#fee2e2;color:#dc2626;"><i class="fas fa-exclamation-circle"></i></div>
+          <div><div class="stat-label">Active Complaints</div><div class="stat-value" id="activeComplaints">–</div></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon" style="background:#fef3c7;color:#d97706;"><i class="fas fa-trophy"></i></div>
+          <div><div class="stat-label">Leaderboard Rank</div><div class="stat-value" id="userRank">#–</div></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-icon" style="background:#dbeafe;color:#2563eb;"><i class="fas fa-recycle"></i></div>
+          <div><div class="stat-label">Waste Recycled</div><div class="stat-value" id="wasteRecycled">–</div></div>
+        </div>
+      </div>
+
+      <div class="map-section">
+        <div class="map-header">
+          <h2><i class="fas fa-map-marked-alt"></i> Live Truck Tracking</h2>
+          <span class="live-badge">Live Now</span>
+        </div>
+        <div id="liveMap"></div>
+      </div>
+
+      <div class="map-header" style="margin-bottom:0.85rem;">
+        <h2 style="font-size:1.15rem;font-weight:700;color:#1e293b;margin:0;display:flex;align-items:center;gap:8px;">
+          <i class="fas fa-bolt" style="color:#f59e0b;"></i> Quick Actions
+        </h2>
+      </div>
+      <div class="quick-grid">
+        <a href="raise-complaint.html" class="quick-card"><i class="fas fa-bullhorn"></i><span>Report Issue</span></a>
+        <a href="livetracking.html" class="quick-card"><i class="fas fa-map-marked-alt"></i><span>Live Tracking</span></a>
+        <a href="nearby-dustbins.html" class="quick-card"><i class="fas fa-map-pin"></i><span>Find Dustbins</span></a>
+        <a href="truck-shedule.html" class="quick-card"><i class="fas fa-calendar-alt"></i><span>Truck Schedule</span></a>
+        <a href="request-truck.html" class="quick-card"><i class="fas fa-truck-loading"></i><span>Request Truck</span></a>
+        <a href="reward-dashboard.html" class="quick-card"><i class="fas fa-gift"></i><span>Rewards</span></a>
+        <a href="browse-listings.html" class="quick-card"><i class="fas fa-store"></i><span>Marketplace</span></a>
+        <a href="notifications.html" class="quick-card"><i class="fas fa-bell"></i><span>Notifications</span></a>
+      </div>
+
+      <div class="updates-grid">
+        <div class="update-card">
+          <h3><i class="fas fa-history"></i> Recent Complaints</h3>
+          <div id="recentComplaints"><p style="color:#94a3b8;text-align:center;padding:1rem;font-size:0.85rem;">Loading...</p></div>
+        </div>
+        <div class="update-card">
+          <h3><i class="fas fa-calendar-check"></i> Upcoming Schedule</h3>
+          <div id="upcomingSchedule"><p style="color:#94a3b8;text-align:center;padding:1rem;font-size:0.85rem;">Loading...</p></div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="../config.js"></script>
+    <script src="../script.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const profile = await window.API.getProfile();
+    document.getElementById('userCoins').textContent = (profile.ecoCoins||0).toLocaleString();
+    document.getElementById('welcomeMsg').textContent = `🌿 Hello, ${profile.name||'Eco Citizen'}!`;
+    document.getElementById('wasteRecycled').textContent = `${Math.floor((profile.ecoCoins||0)/30)} kg`;
+  } catch(e) {
+    document.getElementById('userCoins').textContent = '750';
+    document.getElementById('wasteRecycled').textContent = '25 kg';
+  }
+
+  try {
+    const complaints = await window.API.getMyComplaints();
+    const active = complaints.filter(c=>c.status!=='resolved').length;
+    document.getElementById('activeComplaints').textContent = active;
+    const rc = document.getElementById('recentComplaints');
+    if(complaints.length===0){rc.innerHTML='<p style="color:#94a3b8;text-align:center;padding:1rem;font-size:0.85rem;">No complaints yet. 🌿</p>';}
+    else{
+      rc.innerHTML = complaints.slice(0,4).map(c=>`
+        <div class="update-item">
+          <div style="width:8px;height:8px;border-radius:50%;background:${c.status==='resolved'?'#10b981':c.status==='pending'?'#f59e0b':'#3b82f6'};flex-shrink:0;"></div>
+          <div style="flex:1;"><div style="font-weight:600;">${c.title}</div><div style="color:#94a3b8;font-size:0.78rem;">${window.fmtDate(c.createdAt)}</div></div>
+          <span class="badge badge-${c.status.toLowerCase()}">${c.status}</span>
+        </div>`).join('');
+    }
+  } catch(e) {
+    document.getElementById('activeComplaints').textContent = '0';
+    document.getElementById('recentComplaints').innerHTML='<p style="color:#94a3b8;text-align:center;padding:1rem;font-size:0.85rem;">Connect backend for live data.</p>';
+  }
+
+  try {
+    const lb = await window.API.getLeaderboard();
+    const profile2 = await window.API.getProfile().catch(()=>null);
+    if(profile2){
+      const rank = lb.findIndex(u=>u.id===profile2.id)+1;
+      document.getElementById('userRank').textContent = rank>0?`#${rank}`:'#–';
+    }
+  } catch(e){}
+
+  try {
+    const schedules = await window.API.getSchedules();
+    const sc = document.getElementById('upcomingSchedule');
+    if(!schedules||schedules.length===0){sc.innerHTML='<p style="color:#94a3b8;text-align:center;padding:1rem;font-size:0.85rem;">No upcoming schedules.</p>';}
+    else{
+      const typeColor={COLLECTION:'#10b981',CLEANING:'#3b82f6',AREA_CLEAN:'#f59e0b'};
+      sc.innerHTML = schedules.slice(0,4).map(s=>`
+        <div class="update-item">
+          <div style="width:8px;height:8px;border-radius:50%;background:${typeColor[s.activityType]||'#10b981'};flex-shrink:0;"></div>
+          <div style="flex:1;"><div style="font-weight:600;">${s.activityType||'Collection'}</div><div style="color:#94a3b8;font-size:0.78rem;">📍 ${s.location} | ${s.dayOfWeek} ${s.time}</div></div>
+        </div>`).join('');
+    }
+  } catch(e){
+    document.getElementById('upcomingSchedule').innerHTML='<p style="color:#94a3b8;text-align:center;padding:1rem;font-size:0.85rem;">Connect backend for live data.</p>';
+  }
+
+  // Map
+  const map = window.MAP.init('liveMap');
+  if(map){
+    window.MAP.getUserLocation((coords,ok)=>{
+      window.MAP.userCoords=coords;
+      if(ok)map.setView(coords,14);
+      window.MAP.addMarker(map,coords,'<b>📍 Your Location</b>','user');
+    });
+    window.TruckTracker.init(map);
+  }
+});
+</script>
+</body>
+</html>

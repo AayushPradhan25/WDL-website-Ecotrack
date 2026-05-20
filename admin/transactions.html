@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History | Admin Panel | EcoSmart</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* --- CSS Variables (EcoSmart Theme) --- */
+        
+         :root {
+            --primary-green: #2e7d5e;
+            --bg-light: #f3f4f6;
+            --sidebar-dark: #111827;
+            --sidebar-hover: #1f2937;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        /* --- Global Reset & Layout --- */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* --- Sidebar --- */
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .sidebar-header i {
+            color: var(--primary-green);
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex-grow: 1;
+        }
+        
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-nav a i {
+            width: 24px;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background-color: var(--sidebar-hover);
+            color: var(--white);
+            border-left-color: var(--primary-green);
+        }
+        /* --- Main Content & Top Bar --- */
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .logout-btn {
+            background-color: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .logout-btn:hover {
+            background-color: #ef4444;
+            color: var(--white);
+        }
+        
+        .content-wrapper {
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        /* --- Table Card & Controls --- */
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            overflow: hidden;
+        }
+        
+        .table-controls {
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .search-box {
+            position: relative;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        
+        .search-box input:focus {
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(46, 125, 94, 0.15);
+        }
+        /* --- Data Table --- */
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+        
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+        
+        .data-table th {
+            background-color: #f9fafb;
+            padding: 1rem 1.5rem;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .data-table td {
+            padding: 1rem 1.5rem;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .data-table tbody tr {
+            transition: background-color 0.2s ease;
+        }
+        
+        .data-table tbody tr:hover {
+            background-color: #f9fafb;
+        }
+        /* Specific Table Styling */
+        
+        .coin-amount {
+            font-weight: 600;
+            color: #b45309;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            background-color: #fef3c7;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            width: max-content;
+        }
+        
+        .date-cell {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .empty-state {
+            padding: 3rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        /* Mobile */
+        
+        @media (max-width: 768px) {
+
+        }
+
+        </style>
+    <link rel="stylesheet" href="../style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Sidebar -->
+        <aside class="admin-sidebar"></aside>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <header class="admin-top-bar"></header>
+
+            <div class="content-wrapper">
+                <div class="card">
+                    <!-- Table Controls -->
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchTransactions" placeholder="Search by item or buyer...">
+                        </div>
+                    </div>
+
+                    <!-- Data Table -->
+                    <div class="table-responsive">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Item Purchased</th>
+                                    <th>Buyer Email</th>
+                                    <th>Amount</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionsTable">
+                                <!-- Data will be injected here via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Data array derived from the original hardcoded HTML
+            const mockTransactions = [{
+                    id: 1,
+                    item: 'Plastic bottles',
+                    buyer: 'john@example.com',
+                    amount: 150,
+                    date: '2025-03-25'
+                }, {
+                    id: 2,
+                    item: 'Cardboard boxes',
+                    buyer: 'jane@example.com',
+                    amount: 80,
+                    date: '2025-03-24'
+                }, {
+                    id: 3,
+                    item: 'E-Waste',
+                    buyer: 'robert@example.com',
+                    amount: 200,
+                    date: '2025-03-23'
+                }, {
+                    id: 4,
+                    item: 'Organic Compost',
+                    buyer: 'sally@example.com',
+                    amount: 50,
+                    date: '2025-03-22'
+                }, // Added for demo
+                {
+                    id: 5,
+                    item: 'Scrap Metal',
+                    buyer: 'john@example.com',
+                    amount: 320,
+                    date: '2025-03-20'
+                } // Added for demo
+            ];
+
+            const tbody = document.getElementById('transactionsTable');
+            const searchInput = document.getElementById('searchTransactions');
+
+            // Function to render the table
+            const renderTable = (dataToRender) => {
+                if (dataToRender.length === 0) {
+                    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">No transactions found matching your search.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = dataToRender.map(t => `
+                    <tr>
+                        <td style="color: var(--text-muted);">#${t.id}</td>
+                        <td style="font-weight: 500;">${t.item}</td>
+                        <td>${t.buyer}</td>
+                        <td>
+                            <div class="coin-amount">
+                                <i class="fas fa-coins"></i> ${t.amount}
+                            </div>
+                        </td>
+                        <td class="date-cell">${t.date}</td>
+                    </tr>
+                `).join('');
+            };
+
+            // Initial Render
+            renderTable(mockTransactions);
+
+            // Real-time Search Filter
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const filtered = mockTransactions.filter(t =>
+                    t.item.toLowerCase().includes(searchTerm) ||
+                    t.buyer.toLowerCase().includes(searchTerm)
+                );
+                renderTable(filtered);
+            });
+        });
+
+        function adminLogout() {
+            alert('Logging out of EcoSmart admin panel...');
+        }
+    </script>
+<script src="../config.js"></script>
+    <script src="../script.js"></script>
+</body>
+
+</html>

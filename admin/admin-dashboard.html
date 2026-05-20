@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | EcoSmart</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Leaflet Maps CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+         :root {
+            --primary: #10b981;
+            --bg: #f0fdf4;
+            --sidebar-dark: #064e3b;
+        }
+
+        .content-wrapper {
+            padding: 2rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.1);
+        }
+        
+        .stat-card h3 {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+        
+        .stat-card .number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1e293b;
+        }
+        
+        #fleetMap {
+            height: 400px;
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-top: 2rem;
+            z-index: 10;
+            position: relative;
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .card-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+    </style>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Persistent Sidebar (Injected by script.js) -->
+        <aside class="admin-sidebar"></aside>
+
+        <main class="admin-main">
+            <!-- Top Navigation (Injected by script.js) -->
+            <header class="admin-top-bar"></header>
+
+            <div class="content-wrapper">
+                <div class="stats-grid" id="statsContainer">
+                    <!-- Dynamic Stats -->
+                </div>
+
+                <div class="card-header">
+                    <h2><i class="fas fa-map-marked-alt" style="color: var(--primary);"></i> Live Fleet Tracking</h2>
+                </div>
+                <div id="fleetMap"></div>
+
+                <div style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h2><i class="fas fa-history" style="color: var(--primary);"></i> Recent Activity</h2>
+                    </div>
+                    <div id="activityLog" style="background: white; border-radius: 1.5rem; padding: 1rem; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+                        <p style="color: #64748b; text-align: center;">Loading activity...</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Leaflet Maps JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async() => {
+            // Load Dashboard Stats
+            try {
+                const stats = await window.API.getStats();
+                const container = document.getElementById('statsContainer');
+
+                const items = [{
+                    label: 'Total Users',
+                    val: stats.totalUsers,
+                    icon: 'fa-users'
+                }, {
+                    label: 'Pending Complaints',
+                    val: stats.pendingComplaints,
+                    icon: 'fa-clock'
+                }, {
+                    label: 'Active Trucks',
+                    val: stats.activeTrucks,
+                    icon: 'fa-truck'
+                }, {
+                    label: 'Full Dustbins',
+                    val: stats.activeDustbins,
+                    icon: 'fa-trash'
+                }];
+
+                container.innerHTML = items.map(i => `
+                    <div class="stat-card">
+                        <div style="display: flex; justify-content: space-between;">
+                            <h3>${i.label}</h3>
+                            <i class="fas ${i.icon}" style="color: #10b981; opacity: 0.3;"></i>
+                        </div>
+                        <div class="number">${i.val || 0}</div>
+                    </div>
+                `).join('');
+
+                // Load Recent Activity
+                const activityData = await window.API.getRecentActivity();
+                const log = document.getElementById('activityLog');
+                if (activityData.recentComplaints.length === 0) {
+                    log.innerHTML = '<p style="text-align: center; padding: 1rem;">No recent activity.</p>';
+                } else {
+                    log.innerHTML = activityData.recentComplaints.slice(0, 5).map(c => `
+                        <div style="padding: 12px; border-bottom: 1px solid #f1f5f9; display: flex; justify-content: space-between;">
+                            <span><b>${c.user.name}</b> raised a complaint: "${c.title}"</span>
+                            <span style="color: #94a3b8; font-size: 0.8rem;">${new Date(c.createdAt).toLocaleTimeString()}</span>
+                        </div>
+                    `).join('');
+                }
+
+                // Initialize Live Map
+                const map = window.MAP.init('fleetMap');
+
+                // Add dummy truck locations for the prototype
+                window.MAP.addMarker(map, [28.62, 77.21], '<b>Truck #101</b><br>On Route: Sector 14', 'truck');
+                window.MAP.addMarker(map, [28.61, 77.22], '<b>Truck #104</b><br>Collecting Waste', 'truck');
+
+                // Add bin indicators
+                window.MAP.addMarker(map, [28.615, 77.205], '<b>Bin #B2</b><br>Fill Level: 85%', 'bin');
+
+            } catch (err) {
+                console.error("Dashboard error:", err);
+                window.UI.notify('Failed to load dashboard data', 'error');
+            }
+        });
+    </script>
+</body>
+
+</html>

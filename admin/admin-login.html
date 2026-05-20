@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoSmart | Admin Access</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+         :root {
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --leaf: #065f46;
+            --light-green: #f0fdf4;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: linear-gradient(135deg, var(--leaf) 0%, #0891b2 50%, #059669 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+        
+        .auth-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 2.5rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+            border-top: 5px solid var(--primary);
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        h1 {
+            font-size: 1.75rem;
+            margin-bottom: 0.3rem;
+            color: var(--text-main);
+        }
+        
+        p {
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            font-size: 0.95rem;
+        }
+        
+        .form-group {
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+            font-size: 0.9rem;
+            color: var(--text-main);
+        }
+        
+        input {
+            width: 100%;
+            padding: 0.9rem 1.2rem;
+            border-radius: 1rem;
+            border: 2px solid #e2e8f0;
+            outline: none;
+            transition: var(--transition);
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+        }
+        
+        input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+            background: rgba(16, 185, 129, 0.02);
+        }
+        
+        .btn-submit {
+            width: 100%;
+            padding: 1.1rem;
+            border-radius: 1rem;
+            border: none;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 1.5rem;
+            font-size: 1rem;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+        
+        .btn-submit:active {
+            transform: translateY(-1px);
+        }
+        
+        .footer-link {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .footer-link a {
+            color: var(--primary);
+            font-weight: 600;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        
+        .footer-link a:hover {
+            color: var(--primary-dark);
+        }
+        
+        .security-badge {
+            margin-top: 1.5rem;
+            padding: 0.8rem;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 0.8rem;
+            font-size: 0.8rem;
+            color: var(--primary);
+        }
+        
+        .security-badge i {
+            margin-right: 0.5rem;
+        }
+        
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 2rem 1.5rem;
+            }
+            .logo {
+                font-size: 2rem;
+            }
+            h1 {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="auth-card">
+        <div class="logo">
+            <i class="fas fa-shield-alt"></i> EcoSmart Admin
+        </div>
+        <h1>Management Access</h1>
+        <p>Secure administrative portal for waste management operations</p>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Administrator Email</label>
+                <input type="email" id="email" placeholder="admin@ecosmart.com" required>
+            </div>
+            <div class="form-group">
+                <label>Security Password</label>
+                <input type="password" id="password" placeholder="••••••••" required>
+            </div>
+            <button type="submit" id="loginBtn" class="btn-submit">
+                <i class="fas fa-sign-in-alt"></i> Secure Login
+            </button>
+        </form>
+
+        <div class="security-badge">
+            <i class="fas fa-lock"></i> Your connection is secure
+        </div>
+
+        <div class="footer-link">
+            Having issues? <a href="mailto:support@ecosmart.com">Contact System Support</a>
+        </div>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async(e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Authenticating...';
+            btn.disabled = true;
+
+            try {
+                await window.Auth.login('admin', email, password);
+            } catch (err) {
+                console.error('Admin login failed:', err);
+                btn.innerHTML = '<i class="fas fa-sign-in-alt"></i> Secure Login';
+                btn.disabled = false;
+            }
+        });
+    </script>
+</body>
+
+</html>

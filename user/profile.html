@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Profile | EcoSmart</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #10b981;
+            --bg: #f8fafc;
+            --sidebar-dark: #0f172a;
+        }
+
+        .content-wrapper { padding: 2rem; display: flex; justify-content: center; }
+
+        .profile-card { background: white; padding: 3rem; border-radius: 2rem; box-shadow: 0 10px 25px rgba(0,0,0,0.05); width: 100%; max-width: 500px; }
+        
+        .avatar-section { text-align: center; margin-bottom: 2rem; }
+        .avatar-circle { width: 100px; height: 100px; background: #ecfdf5; color: #10b981; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 3rem; font-weight: 800; border: 4px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        .form-group { margin-bottom: 1.5rem; text-align: left; }
+        label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: #475569; font-size: 0.9rem; }
+        input { width: 100%; padding: 0.8rem 1.2rem; border-radius: 12px; border: 1px solid #e2e8f0; outline: none; transition: 0.3s; font-family: inherit; }
+        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1); }
+        input:disabled { background: #f8fafc; color: #94a3b8; }
+
+        .btn-save { 
+            width: 100%; padding: 1rem; border-radius: 12px; border: none; background: var(--primary); color: white; 
+            font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.3s; margin-top: 1rem;
+        }
+        .btn-save:hover { background: #059669; transform: translateY(-2px); }
+
+        </style>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <div class="user-container">
+        <aside class="user-sidebar"></aside>
+
+        <main class="user-main">
+            <header class="user-header"></header>
+
+            <div class="content-wrapper">
+                <div class="profile-card">
+                    <div class="avatar-section">
+                        <div class="avatar-circle" id="profileInitial">?</div>
+                        <h2 style="margin-top: 1rem; font-weight: 800;" id="displayName">User Name</h2>
+                        <p style="color: #64748b;" id="displayEmail">user@example.com</p>
+                    </div>
+
+                    <form id="profileForm">
+                        <div class="form-group">
+                            <label>Full Name</label>
+                            <input type="text" id="profileName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="profileEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Member ID</label>
+                            <input type="text" id="profileId" disabled>
+                        </div>
+                        <button type="submit" class="btn-save" id="saveBtn">Save Changes</button>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                const user = await window.API.getProfile();
+                
+                document.getElementById('profileName').value = user.name;
+                document.getElementById('profileEmail').value = user.email;
+                document.getElementById('profileId').value = `#${user.id}`;
+                
+                document.getElementById('displayName').innerText = user.name;
+                document.getElementById('displayEmail').innerText = user.email;
+                document.getElementById('profileInitial').innerText = user.name.charAt(0).toUpperCase();
+
+                document.getElementById('profileForm').addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const saveBtn = document.getElementById('saveBtn');
+                    const name = document.getElementById('profileName').value;
+                    const email = document.getElementById('profileEmail').value;
+
+                    try {
+                        saveBtn.disabled = true;
+                        saveBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> Saving...';
+                        
+                        await window.API.updateProfile({ name, email });
+                        
+                        window.UI.notify('Profile updated successfully!');
+                        setTimeout(() => window.location.reload(), 1000);
+                    } catch (err) {
+                        saveBtn.disabled = false;
+                        saveBtn.innerHTML = 'Save Changes';
+                        window.UI.notify(err.message, 'error');
+                    }
+                });
+
+            } catch (err) {
+                console.error("Profile load error:", err);
+            }
+        });
+    </script>
+</body>
+
+</html>

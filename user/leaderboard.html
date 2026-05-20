@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leaderboard | EcoSmart — Top Eco Citizens</title>
+<meta name="description" content="View the EcoSmart community leaderboard. See who's making the biggest impact for our planet!">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+
+.content-wrapper{padding:1.75rem 2rem;flex:1;}
+
+.lb-hero{background:linear-gradient(135deg,#064e3b,#10b981,#34d399);border-radius:1.2rem;padding:2.2rem;color:white;margin-bottom:1.75rem;text-align:center;position:relative;overflow:hidden;}
+.lb-hero::before{content:'🏆';position:absolute;left:2rem;top:50%;transform:translateY(-50%);font-size:5rem;opacity:0.15;}
+.lb-hero::after{content:'🌿';position:absolute;right:2rem;top:50%;transform:translateY(-50%);font-size:5rem;opacity:0.15;}
+.lb-hero h1{margin:0 0 0.4rem;font-size:2rem;font-weight:800;}
+.lb-hero p{margin:0;opacity:0.9;}
+
+.top3{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:1rem;margin-bottom:2rem;align-items:end;}
+.podium{background:white;border-radius:1.1rem;padding:1.5rem 1rem;text-align:center;border:2px solid #e2e8f0;position:relative;transition:all 0.25s;}
+.podium:hover{transform:translateY(-4px);box-shadow:0 12px 28px rgba(0,0,0,0.1);}
+.podium-1{border-color:#fbbf24;background:linear-gradient(180deg,#fffbeb,white);}
+.podium-2{border-color:#94a3b8;background:linear-gradient(180deg,#f8fafc,white);}
+.podium-3{border-color:#d97706;background:linear-gradient(180deg,#fff7ed,white);}
+.podium-crown{font-size:2rem;margin-bottom:0.5rem;}
+.podium-avatar{width:68px;height:68px;border-radius:50%;border:4px solid;margin:0 auto 0.75rem;display:flex;align-items:center;justify-content:center;font-size:1.8rem;font-weight:800;}
+.podium-1 .podium-avatar{border-color:#fbbf24;background:#fef3c7;color:#d97706;}
+.podium-2 .podium-avatar{border-color:#94a3b8;background:#f1f5f9;color:#64748b;}
+.podium-3 .podium-avatar{border-color:#d97706;background:#fff7ed;color:#b45309;}
+.podium-name{font-weight:800;font-size:1rem;color:#1e293b;margin-bottom:0.3rem;}
+.podium-pts{font-size:1.3rem;font-weight:800;color:#10b981;}
+.podium-tier{font-size:0.75rem;color:#64748b;margin-top:2px;}
+.rank-badge{position:absolute;top:-12px;left:50%;transform:translateX(-50%);width:28px;height:28px;border-radius:50%;font-weight:900;font-size:0.85rem;display:flex;align-items:center;justify-content:center;}
+.rb-1{background:#fbbf24;color:white;}
+.rb-2{background:#94a3b8;color:white;}
+.rb-3{background:#d97706;color:white;}
+
+.search-bar{display:flex;gap:0.75rem;margin-bottom:1.25rem;}
+.search-wrap{flex:1;position:relative;}
+.search-wrap i{position:absolute;left:1rem;top:50%;transform:translateY(-50%);color:#94a3b8;}
+.search-input{width:100%;padding:0.7rem 1rem 0.7rem 2.75rem;border:1.5px solid #e2e8f0;border-radius:9px;font-size:0.9rem;font-family:inherit;background:white;box-sizing:border-box;}
+.search-input:focus{outline:none;border-color:#10b981;}
+
+.lb-table-wrap{background:white;border-radius:1rem;border:1px solid #e2e8f0;overflow:hidden;}
+.lb-row{display:flex;align-items:center;gap:1rem;padding:0.9rem 1.25rem;border-bottom:1px solid #f1f5f9;transition:all 0.2s;}
+.lb-row:last-child{border-bottom:none;}
+.lb-row:hover{background:#f8fffe;}
+.lb-row.me{background:#d1fae5;border-left:4px solid #10b981;}
+.lb-rank{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.9rem;flex-shrink:0;}
+.lb-avatar{width:40px;height:40px;border-radius:50%;background:#d1fae5;display:flex;align-items:center;justify-content:center;font-weight:800;color:#065f46;flex-shrink:0;font-size:0.95rem;}
+.lb-info{flex:1;}
+.lb-info h4{margin:0 0 2px;font-size:0.9rem;font-weight:700;color:#1e293b;}
+.lb-info p{margin:0;font-size:0.75rem;color:#64748b;}
+.lb-pts{font-weight:800;color:#10b981;font-size:1rem;}
+.lb-tier{font-size:0.72rem;color:#64748b;text-align:right;}
+
+.my-rank-pin{background:linear-gradient(135deg,#064e3b,#10b981);color:white;border-radius:0.9rem;padding:1.1rem 1.5rem;margin-bottom:1.25rem;display:flex;align-items:center;gap:1rem;}
+.my-rank-pin h4{margin:0 0 2px;font-size:0.95rem;font-weight:700;}
+.my-rank-pin p{margin:0;font-size:0.8rem;opacity:0.9;}
+.my-rank-num{font-size:2rem;font-weight:900;}
+
+@media(max-width:768px){.top3{grid-template-columns:1fr 1fr;}.podium:nth-child(2){grid-column:1/-1;order:-1;}}
+</style>
+</head>
+<body>
+<div class="user-container">
+  <aside class="user-sidebar"></aside>
+  <main class="user-main">
+    <header class="user-header"></header>
+    <div class="content-wrapper">
+
+      <div class="lb-hero">
+        <h1>🏆 Eco Citizen Leaderboard</h1>
+        <p>Top citizens making our planet greener every day. Where do you rank?</p>
+      </div>
+
+      <div id="myRankPin" style="display:none;" class="my-rank-pin">
+        <div class="my-rank-num" id="myRankNum">#–</div>
+        <div><h4>Your Current Rank</h4><p id="myRankMsg">Keep earning eco-coins to climb higher!</p></div>
+        <div style="margin-left:auto;font-size:0.88rem;font-weight:600;" id="myCoinsDisp">– coins</div>
+      </div>
+
+      <div class="top3" id="top3">
+        <div class="podium podium-2"><div class="rank-badge rb-2">2</div><div class="podium-crown">🥈</div><div class="podium-avatar">–</div><div class="podium-name" id="p2name">Loading</div><div class="podium-pts" id="p2pts">–</div></div>
+        <div class="podium podium-1"><div class="rank-badge rb-1">1</div><div class="podium-crown">🥇</div><div class="podium-avatar">–</div><div class="podium-name" id="p1name">Loading</div><div class="podium-pts" id="p1pts">–</div><div class="podium-tier">🌟 Champion</div></div>
+        <div class="podium podium-3"><div class="rank-badge rb-3">3</div><div class="podium-crown">🥉</div><div class="podium-avatar">–</div><div class="podium-name" id="p3name">Loading</div><div class="podium-pts" id="p3pts">–</div></div>
+      </div>
+
+      <div class="search-bar">
+        <div class="search-wrap"><i class="fas fa-search"></i><input class="search-input" type="text" id="searchInput" placeholder="Search citizen..."></div>
+      </div>
+
+      <div class="lb-table-wrap" id="lbList"></div>
+
+    </div>
+  </main>
+</div>
+<script src="../config.js"></script>
+    <script src="../script.js"></script>
+<script>
+const TIER_NAMES=(c)=>c>=5000?'🔷 Diamond':c>=2000?'💎 Platinum':c>=1000?'🥇 Gold':c>=500?'🥈 Silver':'🥉 Bronze';
+let allUsers=[], myId=null;
+
+function renderList(list){
+  document.getElementById('lbList').innerHTML=list.map((u,i)=>{
+    const rank=allUsers.findIndex(x=>x.id===u.id)+1;
+    return`<div class="lb-row ${u.id===myId?'me':''}">
+      <div class="lb-rank" style="background:${rank===1?'#fef3c7':rank===2?'#f1f5f9':rank===3?'#fff7ed':'#f8fafc'};color:${rank===1?'#d97706':rank===2?'#64748b':rank===3?'#b45309':'#94a3b8'};">${rank}</div>
+      <div class="lb-avatar">${(u.name||'?')[0].toUpperCase()}</div>
+      <div class="lb-info"><h4>${u.name||'Citizen'} ${u.id===myId?'<span style="background:#10b981;color:white;padding:2px 8px;border-radius:99px;font-size:0.7rem;">You</span>':''}</h4><p>${TIER_NAMES(u.ecoCoins||0)}</p></div>
+      <div style="text-align:right;"><div class="lb-pts">${(u.ecoCoins||0).toLocaleString()} pts</div></div>
+    </div>`;
+  }).join('');
+}
+
+document.getElementById('searchInput').addEventListener('input',e=>{
+  const q=e.target.value.toLowerCase();
+  renderList(allUsers.filter(u=>(u.name||'').toLowerCase().includes(q)));
+});
+
+document.addEventListener('DOMContentLoaded',async()=>{
+  try{
+    const [lb,me]=await Promise.all([window.API.getLeaderboard(),window.API.getProfile()]);
+    myId=me.id;
+    allUsers=lb;
+
+    // Podium top 3
+    if(lb[0]){document.getElementById('p1name').textContent=lb[0].name;document.getElementById('p1pts').textContent=(lb[0].ecoCoins||0).toLocaleString()+' pts';}
+    if(lb[1]){document.getElementById('p2name').textContent=lb[1].name;document.getElementById('p2pts').textContent=(lb[1].ecoCoins||0).toLocaleString()+' pts';}
+    if(lb[2]){document.getElementById('p3name').textContent=lb[2].name;document.getElementById('p3pts').textContent=(lb[2].ecoCoins||0).toLocaleString()+' pts';}
+
+    const rank=lb.findIndex(u=>u.id===me.id)+1;
+    if(rank>0){
+      document.getElementById('myRankPin').style.display='flex';
+      document.getElementById('myRankNum').textContent=`#${rank}`;
+      document.getElementById('myCoinsDisp').textContent=`${(me.ecoCoins||0).toLocaleString()} coins`;
+      document.getElementById('myRankMsg').textContent=rank===1?'You are the top eco citizen! 🎉 Keep it up!':rank<=5?'Excellent! Top 5 citizen!':'Keep going — every action counts! 🌱';
+    }
+    renderList(lb);
+  }catch(e){
+    document.getElementById('lbList').innerHTML='<div style="text-align:center;color:#94a3b8;padding:3rem;font-size:0.88rem;">Connect backend to see live leaderboard.</div>';
+  }
+});
+</script>
+</body>
+</html>

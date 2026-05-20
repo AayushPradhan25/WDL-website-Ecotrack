@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Tracking | EcoSmart Admin</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Leaflet Maps CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <style>
+        :root {
+            --primary: #10b981;
+            --bg: #f8fafc;
+            --sidebar-dark: #0f172a;
+        }
+
+        .content-wrapper { padding: 0; height: calc(100vh - 70px); position: relative; }
+
+        #adminMap { height: 100%; width: 100%; z-index: 1; }
+
+        .fleet-overlay { 
+            position: absolute; top: 20px; left: 20px; width: 300px; background: white; 
+            padding: 1.5rem; border-radius: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+            z-index: 1000; max-height: 80%; overflow-y: auto;
+        }
+        .truck-item { 
+            display: flex; align-items: center; gap: 12px; padding: 12px 0; 
+            border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: 0.2s;
+        }
+        .truck-item:hover { background: #f8fafc; }
+        .truck-status { width: 10px; height: 10px; border-radius: 50%; }
+
+</style>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="admin-sidebar"></aside>
+
+        <main class="admin-main">
+            <header class="admin-top-bar"></header>
+
+            <div class="content-wrapper">
+                <div class="fleet-overlay">
+                    <h3 style="margin-bottom: 1rem; font-weight: 800;">Active Fleet</h3>
+                    <div id="fleetList">
+                        <p style="color: #64748b;">Scanning for trucks...</p>
+                    </div>
+                </div>
+                <div id="adminMap"></div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Leaflet Maps JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const fleetList = document.getElementById('fleetList');
+            
+            try {
+                const map = window.MAP.init('adminMap');
+                const trucks = await window.API.getTrucks();
+                
+                if (trucks.length === 0) {
+                    fleetList.innerHTML = '<p>No trucks registered.</p>';
+                } else {
+                    fleetList.innerHTML = trucks.map((t, idx) => `
+                        <div class="truck-item" onclick="focusTruck(${idx})">
+                            <i class="fas fa-truck" style="color: #10b981;"></i>
+                            <div style="flex: 1;">
+                                <div style="font-weight: 700; font-size: 0.9rem;">${t.number}</div>
+                                <div style="font-size: 0.75rem; color: #64748b;">Driver: ${t.driverName}</div>
+                            </div>
+                            <div class="truck-status" style="background: ${t.status === 'active' ? '#10b981' : '#f59e0b'};"></div>
+                        </div>
+                    `).join('');
+
+                    // Add dummy markers for demo (centered around New Delhi)
+                    const markers = [
+                        { coords: [28.6139, 77.2090], name: trucks[0]?.number || 'T1' },
+                        { coords: [28.6250, 77.2210], name: trucks[1]?.number || 'T2' }
+                    ];
+
+                    markers.forEach(m => {
+                        window.MAP.addMarker(map, m.coords, `<b>${m.name}</b><br>Status: Active`, 'truck');
+                    });
+                }
+
+            } catch (err) {
+                console.error("Fleet map error:", err);
+            }
+        });
+
+        function focusTruck(idx) {
+            // In a real app, this would center the map on the truck's GPS coords
+            window.UI.notify('Tracking Truck location...');
+        }
+    </script>
+</body>
+
+</html>

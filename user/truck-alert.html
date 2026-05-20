@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tracking Alerts | Eco Smart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Settings Layout */
+        
+        .settings-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .settings-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            margin-bottom: 2rem;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        
+        .settings-header {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .settings-header h3 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        /* Modern Toggle Switch */
+        
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+        
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .3s;
+            border-radius: 34px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+        
+        input:checked+.slider {
+            background-color: var(--success);
+        }
+        
+        input:focus+.slider {
+            box-shadow: 0 0 1px var(--success);
+        }
+        
+        input:checked+.slider:before {
+            transform: translateX(24px);
+        }
+        /* Disabled State */
+        
+        input:disabled+.slider {
+            background-color: #f1f5f9;
+            cursor: not-allowed;
+        }
+        
+        input:disabled+.slider:before {
+            background-color: #cbd5e1;
+        }
+        
+        .setting-row.disabled {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        /* Settings Rows */
+        
+        .setting-row {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: var(--transition);
+        }
+        
+        .setting-row:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-row:hover {
+            background: #f8fafc;
+        }
+        
+        .setting-info {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            max-width: 80%;
+        }
+        
+        .setting-icon {
+            width: 40px;
+            height: 40px;
+            background: #eefdf3;
+            color: var(--primary);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        
+        .setting-text h4 {
+            margin: 0 0 0.3rem 0;
+            font-size: 1.05rem;
+            color: var(--text-main);
+        }
+        
+        .setting-text p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+        /* Master Control specific styling */
+        
+        .master-control {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+        
+        .master-control .settings-header {
+            background: transparent;
+            border-bottom: none;
+        }
+        
+        .master-control h3,
+        .master-control p {
+            color: white;
+        }
+        /* Toast Notification */
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #1e293b;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div style="padding: 1rem; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-leaf" style="font-size: 1.5rem; color: var(--accent);"></i>
+                <h2 style="font-size: 1.2rem;">Eco Smart</h2>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div>
+                    <h1>Tracking Alerts</h1>
+                    <p style="color: var(--text-muted);">Manage your real-time notification preferences</p>
+                </div>
+                <button class="btn btn-danger" onclick="Auth.logout('user')">Logout</button>
+            </header>
+
+            <div class="settings-container">
+                <div class="settings-card master-control">
+                    <div class="settings-header">
+                        <div>
+                            <h3><i class="fas fa-bell"></i> Master Notification Switch</h3>
+                            <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; opacity: 0.9;">Turn off all alerts globally. This overrides individual settings below.</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" id="masterToggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-card" id="trackingSettings">
+                    <div class="settings-header">
+                        <h3>Vehicle Tracking</h3>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-icon"><i class="fas fa-truck"></i></div>
+                            <div class="setting-text">
+                                <h4>Truck Approaching</h4>
+                                <p>Get a push notification when the collection truck is within 15 minutes of your location.</p>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" class="sub-toggle" id="alertApproaching" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-icon" style="background: #fffbeb; color: #d97706;"><i class="fas fa-exclamation-triangle"></i></div>
+                            <div class="setting-text">
+                                <h4>Delay Alerts</h4>
+                                <p>Receive updates if there are significant delays or route changes affecting your sector.</p>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" class="sub-toggle" id="alertDelays" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-icon" style="background: #fee2e2; color: #ef4444;"><i class="fas fa-times-circle"></i></div>
+                            <div class="setting-text">
+                                <h4>Missed Pickups</h4>
+                                <p>Alert me if my registered smart bin was skipped during the daily collection run.</p>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" class="sub-toggle" id="alertMissed">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="settings-card" id="channelSettings">
+                    <div class="settings-header">
+                        <h3>Notification Channels</h3>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-icon" style="background: #e0e7ff; color: #4f46e5;"><i class="fas fa-mobile-alt"></i></div>
+                            <div class="setting-text">
+                                <h4>Push Notifications</h4>
+                                <p>Receive alerts directly on your device screen (Recommended).</p>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" class="sub-toggle channel-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                    <div class="setting-row">
+                        <div class="setting-info">
+                            <div class="setting-icon" style="background: #f1f5f9; color: #64748b;"><i class="fas fa-envelope"></i></div>
+                            <div class="setting-text">
+                                <h4>Email Summary</h4>
+                                <p>Get a weekly digest of your sector's collection stats and any major alerts.</p>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox" class="sub-toggle channel-toggle">
+                            <span class="slider"></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast" id="saveToast">
+        <i class="fas fa-check-circle" style="color: var(--success);"></i>
+        <span>Preferences updated successfully</span>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const masterToggle = document.getElementById('masterToggle');
+            const subToggles = document.querySelectorAll('.sub-toggle');
+            const settingRows = document.querySelectorAll('#trackingSettings .setting-row, #channelSettings .setting-row');
+            const toast = document.getElementById('saveToast');
+            let toastTimeout;
+
+            // Function to show elegant toast notification instead of alert()
+            const showToast = () => {
+                clearTimeout(toastTimeout);
+                toast.classList.add('show');
+                toastTimeout = setTimeout(() => {
+                    toast.classList.remove('show');
+                }, 3000);
+            };
+
+            // Master Toggle Logic
+            masterToggle.addEventListener('change', (e) => {
+                const isEnabled = e.target.checked;
+
+                // Visual feedback for the master card
+                e.target.closest('.master-control').style.background = isEnabled ?
+                    'linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%)' :
+                    '#64748b';
+
+                // Disable/Enable all sub-toggles
+                subToggles.forEach(toggle => {
+                    toggle.disabled = !isEnabled;
+                });
+
+                // Grey out the rows for visual hierarchy
+                settingRows.forEach(row => {
+                    if (!isEnabled) {
+                        row.classList.add('disabled');
+                    } else {
+                        row.classList.remove('disabled');
+                    }
+                });
+
+                showToast();
+
+                // In a real app, you would save this state to localStorage/API here
+                localStorage.setItem('eco_master_alerts', isEnabled);
+            });
+
+            // Sub-toggles Auto-save Simulation
+            subToggles.forEach(toggle => {
+                toggle.addEventListener('change', () => {
+                    showToast();
+                    // Example: localStorage.setItem(toggle.id, toggle.checked);
+                });
+            });
+
+            // Load initial state (Mock)
+            const savedMasterState = localStorage.getItem('eco_master_alerts');
+            if (savedMasterState === 'false') {
+                masterToggle.click(); // Trigger the logic to turn things off initially if saved that way
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Truck Schedule | EcoSmart — Collection Timetable</title>
+<meta name="description" content="View the weekly timetable for garbage truck collections, dustbin cleaning, and area sanitation in your zone.">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../style.css">
+<style>
+
+.content-wrapper{padding:1.75rem 2rem;flex:1;}
+
+.page-hero{background:linear-gradient(135deg,#064e3b,#10b981);border-radius:1rem;padding:1.75rem 2rem;color:white;margin-bottom:1.5rem;}
+.page-hero h1{margin:0 0 0.3rem;font-size:1.6rem;font-weight:800;}
+.page-hero p{margin:0;opacity:0.9;font-size:0.9rem;}
+
+.legend-row{display:flex;gap:1.25rem;flex-wrap:wrap;margin-bottom:1.5rem;}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:0.82rem;color:#475569;font-weight:600;}
+.legend-dot{width:12px;height:12px;border-radius:3px;}
+
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0.75rem;margin-bottom:1.75rem;}
+.day-col{background:white;border-radius:1rem;border:1px solid #e2e8f0;overflow:hidden;min-height:200px;}
+.day-header{background:#064e3b;color:white;text-align:center;padding:0.75rem 0.5rem;}
+.day-header .day-name{font-weight:700;font-size:0.88rem;}
+.day-header .day-date{font-size:0.75rem;opacity:0.8;}
+.day-header.today{background:linear-gradient(135deg,#10b981,#059669);}
+.day-events{padding:0.5rem;}
+.event-chip{padding:0.5rem 0.6rem;border-radius:0.5rem;margin-bottom:0.4rem;font-size:0.73rem;font-weight:600;display:flex;align-items:center;gap:5px;}
+.ev-collect{background:#d1fae5;color:#065f46;}
+.ev-clean{background:#dbeafe;color:#1e40af;}
+.ev-area{background:#fef3c7;color:#78350f;}
+.ev-special{background:#ede9fe;color:#4c1d95;}
+.day-empty{text-align:center;padding:1.5rem 0.5rem;color:#cbd5e1;font-size:0.75rem;}
+
+.list-section{background:white;border-radius:1rem;border:1px solid #e2e8f0;padding:1.5rem;margin-bottom:1.5rem;}
+.list-section h3{font-size:1.05rem;font-weight:700;color:#1e293b;margin:0 0 1.25rem;display:flex;align-items:center;gap:8px;}
+.list-section h3 i{color:#10b981;}
+.sched-item{display:flex;align-items:center;gap:1rem;padding:1rem;border-radius:0.85rem;border:1px solid #f1f5f9;margin-bottom:0.75rem;transition:all 0.2s;}
+.sched-item:hover{border-color:#10b981;background:#f8fffe;}
+.sched-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;}
+.sched-info{flex:1;}
+.sched-info h4{margin:0 0 3px;font-size:0.92rem;font-weight:700;color:#1e293b;}
+.sched-info p{margin:0;font-size:0.8rem;color:#64748b;}
+.sched-time{font-size:0.88rem;font-weight:700;color:#10b981;white-space:nowrap;}
+
+.notify-btn{padding:0.4rem 0.9rem;border:1.5px solid #10b981;border-radius:7px;background:transparent;color:#10b981;font-size:0.78rem;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.2s;}
+.notify-btn:hover{background:#10b981;color:white;}
+.notify-btn.active{background:#10b981;color:white;}
+
+@media(max-width:1024px){.week-grid{grid-template-columns:repeat(4,1fr);}}
+@media(max-width:640px){.week-grid{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<div class="user-container">
+  <aside class="user-sidebar"></aside>
+  <main class="user-main">
+    <header class="user-header"></header>
+    <div class="content-wrapper">
+
+      <div class="page-hero">
+        <h1><i class="fas fa-calendar-alt"></i> Waste Collection Schedule</h1>
+        <p>Weekly timetable for garbage collection, dustbin cleaning, and area sanitation in your zone.</p>
+      </div>
+
+      <div class="legend-row">
+        <div class="legend-item"><div class="legend-dot" style="background:#10b981;"></div>Garbage Collection</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#3b82f6;"></div>Dustbin Cleaning</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#f59e0b;"></div>Area Sanitization</div>
+        <div class="legend-item"><div class="legend-dot" style="background:#8b5cf6;"></div>Special Drive</div>
+      </div>
+
+      <div class="week-grid" id="weekGrid">
+        <!-- JS rendered -->
+      </div>
+
+      <div class="list-section">
+        <h3><i class="fas fa-list-ul"></i> All Scheduled Activities</h3>
+        <div id="schedList"><p style="color:#94a3b8;text-align:center;padding:1rem;font-size:0.85rem;">Loading schedules...</p></div>
+      </div>
+
+    </div>
+  </main>
+</div>
+<script src="../config.js"></script>
+    <script src="../script.js"></script>
+<script>
+const DAYS=['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const TODAY_IDX=new Date().getDay()===0?6:new Date().getDay()-1;
+
+const FALLBACK=[
+  {dayOfWeek:'Monday',time:'08:00 AM',location:'Sector 14',activityType:'COLLECTION',truck:{number:'T-001'}},
+  {dayOfWeek:'Monday',time:'10:30 AM',location:'Sector 16',activityType:'CLEANING',truck:{number:'T-002'}},
+  {dayOfWeek:'Tuesday',time:'08:30 AM',location:'Sector 14',activityType:'COLLECTION',truck:{number:'T-001'}},
+  {dayOfWeek:'Wednesday',time:'09:00 AM',location:'Market Area',activityType:'AREA_CLEAN',truck:{number:'T-003'}},
+  {dayOfWeek:'Wednesday',time:'11:00 AM',location:'Sector 16',activityType:'COLLECTION',truck:{number:'T-002'}},
+  {dayOfWeek:'Thursday',time:'08:00 AM',location:'Sector 14',activityType:'COLLECTION',truck:{number:'T-001'}},
+  {dayOfWeek:'Thursday',time:'02:00 PM',location:'All Zones',activityType:'CLEANING',truck:{number:'T-003'}},
+  {dayOfWeek:'Friday',time:'07:30 AM',location:'Sector 14',activityType:'COLLECTION',truck:{number:'T-001'}},
+  {dayOfWeek:'Friday',time:'10:00 AM',location:'Park Area',activityType:'AREA_CLEAN',truck:{number:'T-002'}},
+  {dayOfWeek:'Saturday',time:'09:00 AM',location:'All Zones',activityType:'COLLECTION',truck:{number:'T-001'}},
+  {dayOfWeek:'Saturday',time:'11:00 AM',location:'Sector 14 Bins',activityType:'CLEANING',truck:{number:'T-003'}},
+  {dayOfWeek:'Saturday',time:'02:00 PM',location:'City Park',activityType:'AREA_CLEAN',truck:{number:'T-002'}},
+  {dayOfWeek:'Sunday',time:'10:00 AM',location:'Special Event Zone',activityType:'SPECIAL',truck:{number:'T-ALL'}},
+];
+
+const TYPE_CFG={
+  COLLECTION:{cls:'ev-collect',icon:'fa-truck',label:'Garbage Collection',bg:'d1fae5',color:'065f46',chipBg:'#d1fae5',chipColor:'#065f46',iconBg:'#d1fae5',iconColor:'#059669'},
+  CLEANING:  {cls:'ev-clean',icon:'fa-broom',label:'Dustbin Cleaning',chipBg:'#dbeafe',chipColor:'#1e40af',iconBg:'#dbeafe',iconColor:'#2563eb'},
+  AREA_CLEAN:{cls:'ev-area',icon:'fa-leaf',label:'Area Sanitization',chipBg:'#fef3c7',chipColor:'#78350f',iconBg:'#fef3c7',iconColor:'#d97706'},
+  SPECIAL:   {cls:'ev-special',icon:'fa-star',label:'Special Drive',chipBg:'#ede9fe',chipColor:'#4c1d95',iconBg:'#ede9fe',iconColor:'#7c3aed'},
+};
+
+function renderWeek(data){
+  const grid=document.getElementById('weekGrid');
+  grid.innerHTML=DAYS.map((day,i)=>{
+    const evs=data.filter(s=>s.dayOfWeek===day);
+    return `<div class="day-col">
+      <div class="day-header ${i===TODAY_IDX?'today':''}">
+        <div class="day-name">${day.substring(0,3)}</div>
+        <div class="day-date">${i===TODAY_IDX?'Today':''}</div>
+      </div>
+      <div class="day-events">
+        ${evs.length?evs.map(e=>{const c=TYPE_CFG[e.activityType]||TYPE_CFG.COLLECTION;return`<div class="event-chip ${c.cls}"><i class="fas ${c.icon}"></i>${e.time}</div>`}).join('')
+          :`<div class="day-empty">No schedule</div>`}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderList(data){
+  const list=document.getElementById('schedList');
+  if(!data.length){list.innerHTML='<p style="color:#94a3b8;text-align:center;">No schedules found.</p>';return;}
+  list.innerHTML=data.map(s=>{
+    const c=TYPE_CFG[s.activityType]||TYPE_CFG.COLLECTION;
+    return`<div class="sched-item">
+      <div class="sched-icon" style="background:${c.iconBg||'#d1fae5'};color:${c.iconColor||'#059669'};"><i class="fas ${c.icon}"></i></div>
+      <div class="sched-info">
+        <h4>${c.label} — ${s.location}</h4>
+        <p>📅 ${s.dayOfWeek} | 🚛 ${s.truck?.number||'General'} | Status: <b>${s.status||'Scheduled'}</b></p>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.75rem;">
+        <div class="sched-time">${s.time}</div>
+        <button class="notify-btn" onclick="this.classList.toggle('active');window.UI.notify(this.classList.contains('active')?'Reminder set! We\\'ll alert you before collection.':'Reminder removed.','success')">
+          <i class="fas fa-bell"></i>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+document.addEventListener('DOMContentLoaded',async()=>{
+  let data=FALLBACK;
+  try{const r=await window.API.getSchedules();if(r&&r.length)data=r;}catch(e){}
+  renderWeek(data);
+  renderList(data);
+});
+</script>
+</body>
+</html>

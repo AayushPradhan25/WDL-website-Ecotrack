@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications | Eco Smart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        /* Notification Specific Styles */
+        
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .notif-tabs {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .notif-tab {
+            background: none;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid transparent;
+            transition: var(--transition);
+        }
+        
+        .notif-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+        /* Notification Items */
+        
+        .notif-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .notif-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1.2rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .notif-item:hover {
+            box-shadow: var(--shadow);
+            border-color: #cbd5e1;
+        }
+        /* Unread State */
+        
+        .notif-item.unread {
+            background: #f8fafc;
+            border-left: 4px solid var(--primary-light);
+        }
+        
+        .notif-item.unread::after {
+            content: '';
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            width: 8px;
+            height: 8px;
+            background: var(--primary-light);
+            border-radius: 50%;
+        }
+        /* Icon Styling by Type */
+        
+        .notif-icon-wrapper {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.2rem;
+        }
+        
+        .icon-success {
+            background: #dcfce7;
+            color: var(--success);
+        }
+        
+        .icon-alert {
+            background: #fee2e2;
+            color: var(--danger);
+        }
+        
+        .icon-info {
+            background: #e0f2fe;
+            color: #0284c7;
+        }
+        
+        .icon-system {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+        
+        .notif-content {
+            flex: 1;
+        }
+        
+        .notif-title {
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+            color: var(--text-main);
+        }
+        
+        .notif-message {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 0.5rem;
+        }
+        
+        .notif-meta {
+            font-size: 0.8rem;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        /* Actions shown on hover */
+        
+        .notif-actions {
+            opacity: 0;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .notif-item:hover .notif-actions {
+            opacity: 1;
+        }
+        
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+        }
+        
+        .action-btn:hover {
+            background: #e2e8f0;
+            color: var(--text-main);
+        }
+        /* Empty State */
+        
+        .empty-state {
+            text-align: center;
+            padding: 4rem 1rem;
+            color: var(--text-muted);
+        }
+        /* Navigation Breadcrumb */
+        
+        .breadcrumb-nav {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            flex-wrap: wrap;
+        }
+        
+        .breadcrumb-nav a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        
+        .breadcrumb-nav a:hover {
+            color: var(--primary-dark);
+            transform: translateX(2px);
+        }
+        
+        .breadcrumb-nav .separator {
+            color: var(--text-muted);
+            margin: 0 0.3rem;
+        }
+        
+        .breadcrumb-nav .current {
+            color: var(--text-main);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .nav-column {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, rgba(16, 185, 129, 0.02) 100%);
+            border-radius: var(--radius-md);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .nav-column-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .nav-column-right {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .quick-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            color: var(--text-main);
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-decoration: none;
+        }
+        
+        .quick-nav-btn:hover {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+        
+        @media (max-width: 768px) {
+            .nav-column {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            .nav-column-right {
+                width: 100%;
+                justify-content: space-between;
+            }
+            .breadcrumb-nav {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div style="padding: 1rem; display: flex; align-items: center; gap: 10px;">
+                <i class="fas fa-leaf" style="font-size: 1.5rem; color: var(--accent);"></i>
+                <h2 style="font-size: 1.2rem;">Eco Smart</h2>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div>
+                    <h1>Notifications</h1>
+                    <p style="color: var(--text-muted);">Stay updated on your eco-activities</p>
+                </div>
+                <button class="btn btn-danger" onclick="Auth.logout('user')">Logout</button>
+            </header>
+
+            <!-- Navigation Column -->
+            <div class="nav-column">
+                <div class="nav-column-left">
+                    <div class="breadcrumb-nav">
+                        <a href="dashboard.html" title="Go to Dashboard">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                        <span class="separator">/</span>
+                        <span class="current">
+                            <i class="fas fa-bell"></i> Notifications
+                        </span>
+                    </div>
+                </div>
+                <div class="nav-column-right">
+                    <a href="dashboard.html" class="quick-nav-btn">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                    <a href="profile.html" class="quick-nav-btn">
+                        <i class="fas fa-user"></i> Profile
+                    </a>
+                </div>
+            </div>
+
+            <div class="card" style="padding: 1.5rem;">
+
+                <div class="notification-header">
+                    <div class="notif-tabs">
+                        <button class="notif-tab active" id="tabAll">All Updates</button>
+                        <button class="notif-tab" id="tabUnread">Unread <span id="unreadCountBadge" class="badge badge-warning" style="margin-left:5px; font-size:0.7rem;"></span></button>
+                    </div>
+                    <button class="btn btn-secondary" id="markAllReadBtn" style="font-size: 0.85rem; padding: 0.4rem 0.8rem;">
+                        <i class="fas fa-check-double"></i> Mark all as read
+                    </button>
+                </div>
+
+                <div id="notificationsList" class="notif-list">
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+                    // Enhanced Mock Data structure including 'type' and 'isRead'
+                    let notifs = window.ecoState ? notifications || [{
+                        id: 1,
+                        type: 'alert',
+                        title: 'Collection Delayed',
+                        message: 'Your scheduled waste collection for Sector 14 is delayed by 30 mins due to traffic.',
+                        time: '10 mins ago',
+                        isRead: false
+                    }, {
+                        id: 2,
+                        type: 'success',
+                        title: 'Points Earned!',
+                        message: 'You earned 50 Eco Points for recycling e-waste successfully. Keep it up!',
+                        time: '2 hours ago',
+                        isRead: false
+                    }, {
+                        id: 3,
+                        type: 'info',
+                        title: 'New Smart Bin Installed',
+                        message: 'A new sensor-enabled smart bin has been placed near Central Park North.',
+                        time: 'Yesterday',
+                        isRead: true
+                    }, {
+                        id: 4,
+                        type: 'system',
+                        title: 'System Maintenance',
+                        message: 'The live tracking feature will be down for maintenance tonight from 1 AM to 3 AM.',
+                        time: 'Yesterday',
+                        isRead: true
+                    }] : [];
+
+                    const listEl = document.getElementById('notificationsList');
+                    const unreadCountBadge = document.getElementById('unreadCountBadge');
+                    let currentFilter = 'all'; // 'all' or 'unread'
+
+                    // Helper to get icon config based on type
+                    const getIconConfig = (type) => {
+                        const configs = {
+                            'alert': {
+                                icon: 'fa-exclamation-triangle',
+                                bgClass: 'icon-alert'
+                            },
+                            'success': {
+                                icon: 'fa-star',
+                                bgClass: 'icon-success'
+                            },
+                            'info': {
+                                icon: 'fa-info-circle',
+                                bgClass: 'icon-info'
+                            },
+                            'system': {
+                                icon: 'fa-cog',
+                                bgClass: 'icon-system'
+                            }
+                        };
+                        return configs[type] || configs['info'];
+                    };
+
+                    const renderNotifications = () => {
+                            let html = '';
+                            let unreadCount = 0;
+
+                            const filtered = notifs.filter(n => {
+                                if (!n.isRead) unreadCount++;
+                                if (currentFilter === 'unread') return !n.isRead;
+                                return true;
+                            });
+
+                            // Update unread badge in tab
+                            unreadCountBadge.innerText = unreadCount > 0 ? unreadCount : '';
+                            unreadCountBadge.style.display = unreadCount > 0 ? 'inline-block' : 'none';
+
+                            if (filtered.length === 0) {
+                                listEl.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-bell-slash" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 1rem;"></i>
+                            <h3>You're all caught up!</h3>
+                            <p>No ${currentFilter === 'unread' ? 'unread ' : ''}notifications right now.</p>
+                        </div>
+                    `;
+                                return;
+                            }
+
+                            filtered.forEach(n => {
+                                        const iconConfig = getIconConfig(n.type);
+
+                                        html += `
+                        <div class="notif-item ${n.isRead ? '' : 'unread'}" data-id="${n.id}">
+                            <div class="notif-icon-wrapper ${iconConfig.bgClass}">
+                                <i class="fas ${iconConfig.icon}"></i>
+                            </div>
+                            <div class="notif-content">
+                                <div class="notif-title">${n.title}</div>
+                                <div class="notif-message">${n.message}</div>
+                                <div class="notif-meta">
+                                    <i class="far fa-clock"></i> ${n.time}
+                                </div>
+                            </div>
+                            <div class="notif-actions">
+                                ${!n.isRead ? `<button class="action-btn mark-read-btn" title="Mark as read"><i class="fas fa-check"></i></button>` : ''}
+                                <button class="action-btn delete-btn" title="Delete"><i class="fas fa-trash-alt"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                listEl.innerHTML = html;
+                attachEventListeners();
+            };
+
+            const attachEventListeners = () => {
+                // Mark Single as Read
+                document.querySelectorAll('.mark-read-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.closest('.notif-item').dataset.id);
+                        const notif = notifs.find(n => n.id === id);
+                        if(notif) notif.isRead = true;
+                        renderNotifications();
+                    });
+                });
+
+                // Delete Single
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const id = parseInt(e.target.closest('.notif-item').dataset.id);
+                        notifs = notifs.filter(n => n.id !== id);
+                        renderNotifications();
+                    });
+                });
+            };
+
+            // Global Actions
+            document.getElementById('markAllReadBtn').addEventListener('click', () => {
+                notifs.forEach(n => n.isRead = true);
+                renderNotifications();
+            });
+
+            // Tabs Logic
+            document.getElementById('tabAll').addEventListener('click', (e) => {
+                currentFilter = 'all';
+                e.target.classList.add('active');
+                document.getElementById('tabUnread').classList.remove('active');
+                renderNotifications();
+            });
+
+            document.getElementById('tabUnread').addEventListener('click', (e) => {
+                currentFilter = 'unread';
+                e.target.classList.add('active');
+                document.getElementById('tabAll').classList.remove('active');
+                renderNotifications();
+            });
+
+            // Initial Render
+            renderNotifications();
+        });
+    </script>
+</body>
+
+</html>

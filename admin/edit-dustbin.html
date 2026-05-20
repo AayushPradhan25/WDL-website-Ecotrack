@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Dustbin | Admin Panel | Eco Smart</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+
+    <style>
+        /* --- CSS Variables --- */
+        
+         :root {
+            --primary-green: #2e7d5e;
+            --bg-light: #f3f4f6;
+            --sidebar-dark: #111827;
+            --sidebar-hover: #1f2937;
+            --text-dark: #1f2937;
+            --text-muted: #6b7280;
+            --white: #ffffff;
+            --border-color: #e5e7eb;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        /* --- Global Reset & Layout --- */
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        
+        body {
+            background-color: var(--bg-light);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* --- Sidebar --- */
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        
+        .sidebar-header i {
+            color: var(--primary-green);
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-nav {
+            padding: 1rem 0;
+            flex-grow: 1;
+        }
+        
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            padding: 0.875rem 1.5rem;
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            border-left: 4px solid transparent;
+        }
+        
+        .sidebar-nav a i {
+            width: 24px;
+            margin-right: 0.75rem;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+        
+        .sidebar-nav a:hover,
+        .sidebar-nav a.active {
+            background-color: var(--sidebar-hover);
+            color: var(--white);
+            border-left-color: var(--primary-green);
+        }
+        /* --- Main Content & Top Bar --- */
+
+        .page-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logout-btn {
+            background-color: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+        
+        .logout-btn:hover {
+            background-color: #ef4444;
+            color: var(--white);
+        }
+        
+        .content-wrapper {
+            padding: 2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+        /* --- Buttons --- */
+        
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-back:hover {
+            color: var(--primary-green);
+        }
+        
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            border: none;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-size: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-green);
+            color: var(--white);
+            flex: 1;
+        }
+        
+        .btn-primary:hover {
+            background-color: #1a533d;
+            box-shadow: 0 4px 12px rgba(46, 125, 94, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .btn-danger {
+            background-color: transparent;
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 0.875rem 1.5rem;
+        }
+        
+        .btn-danger:hover {
+            background-color: #ef4444;
+            color: var(--white);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+            transform: translateY(-1px);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        /* --- Card, Context & Form --- */
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .context-info {
+            background-color: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .context-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #e0f2fe;
+            color: #0284c7;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .context-text h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-dark);
+        }
+        
+        .context-text p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 600;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+        
+        .input-wrapper {
+            position: relative;
+        }
+        
+        .input-wrapper i {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 2.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            color: var(--text-dark);
+            background-color: var(--white);
+            transition: var(--transition);
+        }
+        
+        select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 1.2rem;
+            cursor: pointer;
+            text-transform: capitalize;
+        }
+        
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary-green);
+            box-shadow: 0 0 0 3px rgba(46, 125, 94, 0.15);
+        }
+        
+        input[type="text"]:focus+i,
+        .input-wrapper:focus-within i {
+            color: var(--primary-green);
+        }
+        /* --- Toast Notification --- */
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--text-dark);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 3000;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast i {
+            color: #10b981;
+        }
+        /* Error State */
+        
+        .error-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+        /* Mobile Adjustments */
+        
+        @media (max-width: 768px) {
+
+            .button-group {
+                flex-direction: column;
+            }
+        }
+
+        </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="admin-container">
+        <aside class="admin-sidebar"></aside>
+
+        <main class="admin-main">
+            <header class="admin-top-bar"></header>
+
+            <div class="content-wrapper">
+                <a href="dustbins.html" class="btn-back"><i class="fas fa-arrow-left"></i> Back to Dustbins</a>
+
+                <div id="editContainer">
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast" id="toastNotification">
+        <i class="fas fa-check-circle" id="toastIcon"></i>
+        <span id="toastMsg">Dustbin updated successfully!</span>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const dustbinId = urlParams.get('id');
+            const container = document.getElementById('editContainer');
+
+            // Safely fetch dustbin from mock data
+            const allDustbins = (window.mockData && window.mockData.dustbins) ? window.mockData.dustbins : [];
+            const dustbinIndex = allDustbins.findIndex(d => d.id == dustbinId);
+            const dustbin = allDustbins[dustbinIndex];
+
+            if (dustbin) {
+                // Render the form with context
+                container.innerHTML = `
+                    <div class="card">
+                        <div class="context-info">
+                            <div class="context-icon"><i class="fas fa-trash-alt"></i></div>
+                            <div class="context-text">
+                                <h3>Settings for Dustbin</h3>
+                                <p>ID: #${dustbin.id}</p>
+                            </div>
+                        </div>
+
+                        <form id="editForm">
+                            <div class="form-group">
+                                <label for="location">Location / Landmark</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    <input type="text" id="location" value="${dustbin.location}" required autocomplete="off">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="capacity">Current Capacity</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-weight-hanging"></i>
+                                    <input type="text" id="capacity" value="${dustbin.capacity}" required autocomplete="off">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="status">Operational Status</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-info-circle"></i>
+                                    <select id="status">
+                                        <option value="active" ${dustbin.status.toLowerCase() === 'active' ? 'selected' : ''}>Active</option>
+                                        <option value="full" ${dustbin.status.toLowerCase() === 'full' ? 'selected' : ''}>Full</option>
+                                        <option value="damaged" ${dustbin.status.toLowerCase() === 'damaged' ? 'selected' : ''}>Damaged / Maintenance</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="button-group">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> Save Changes
+                                </button>
+                                <button type="button" class="btn btn-danger" id="deleteBtn">
+                                    <i class="fas fa-trash"></i> Delete Dustbin
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                `;
+
+                // Handle Update
+                document.getElementById('editForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+
+                    // Update the local mock data
+                    dustbin.location = document.getElementById('location').value.trim();
+                    dustbin.capacity = document.getElementById('capacity').value.trim();
+                    dustbin.status = document.getElementById('status').value;
+
+                    // Show Toast Notification
+                    showToast('Dustbin updated successfully!', 'fa-check-circle', '#10b981');
+
+                    setTimeout(() => {
+                        window.location.href = 'dustbins.html';
+                    }, 1500);
+                });
+
+                // Handle Delete
+                document.getElementById('deleteBtn').addEventListener('click', () => {
+                    const confirmDelete = confirm(`Are you sure you want to permanently delete Dustbin #${dustbin.id}?`);
+                    if (confirmDelete) {
+                        // Remove from mock data
+                        allDustbins.splice(dustbinIndex, 1);
+
+                        // Show Toast Notification
+                        showToast('Dustbin deleted successfully.', 'fa-trash', '#ef4444');
+
+                        setTimeout(() => {
+                            window.location.href = 'dustbins.html';
+                        }, 1500);
+                    }
+                });
+
+            } else {
+                // Handle invalid dustbin ID
+                container.innerHTML = `
+                    <div class="card error-state">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 3rem; margin-bottom: 1rem; color: #cbd5e1;"></i>
+                        <h2>Dustbin Not Found</h2>
+                        <p>We couldn't locate the dustbin you are trying to edit. It may have been removed.</p>
+                    </div>
+                `;
+            }
+
+            // Helper function for Toasts
+            function showToast(message, iconClass, color) {
+                const toast = document.getElementById('toastNotification');
+                const toastMsg = document.getElementById('toastMsg');
+                const toastIcon = document.getElementById('toastIcon');
+
+                toastMsg.innerText = message;
+                toastIcon.className = `fas ${iconClass}`;
+                toastIcon.style.color = color;
+
+                toast.classList.add('show');
+            }
+        });
+    </script>
+</body>
+
+</html>

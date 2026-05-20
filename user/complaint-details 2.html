@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaint Details | Eco Smart</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="../style.css">
+    <style>
+        .details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .status-tracker {
+            display: flex;
+            justify-content: space-between;
+            margin: 2rem 0;
+            position: relative;
+        }
+        
+        .status-step {
+            text-align: center;
+            flex: 1;
+            z-index: 2;
+        }
+        
+        .step-icon {
+            width: 40px;
+            height: 40px;
+            background: #e2e8f0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 0.5rem;
+            color: white;
+            transition: var(--transition);
+        }
+        
+        .status-step.active .step-icon {
+            background: var(--primary-light);
+        }
+        
+        .status-step.completed .step-icon {
+            background: var(--success);
+        }
+        
+        .tracker-line {
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 2px;
+            background: #e2e8f0;
+            z-index: 1;
+        }
+        
+        .meta-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            background: var(--bg-main);
+            padding: 1.5rem;
+            border-radius: var(--radius-md);
+        }
+        
+        .meta-item label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .meta-item span {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <h2 style="margin-bottom: 2rem;">EcoSmart</h2>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <a href="complaint-list.html" class="btn btn-secondary" style="padding: 8px;">
+                        <i class="fas fa-arrow-left"></i>
+                    </a>
+                    <h1>Complaint <span id="refId">#...</span></h1>
+                </div>
+                <button class="btn btn-danger" onclick="Auth.logout('user')">Logout</button>
+            </header>
+
+            <div class="card">
+                <div class="details-header">
+                    <div>
+                        <h2 id="complaintTitle" style="margin-bottom: 0.5rem;">Loading title...</h2>
+                        <span id="statusBadge" class="badge">PENDING</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <div id="filedDate" style="color: var(--text-muted); font-size: 0.9rem;">Filed on ...</div>
+                    </div>
+                </div>
+
+                <div class="status-tracker">
+                    <div class="tracker-line"></div>
+                    <div class="status-step" id="step-pending">
+                        <div class="step-icon"><i class="fas fa-file-alt"></i></div>
+                        <div style="font-size: 0.8rem; font-weight: 600;">Filed</div>
+                    </div>
+                    <div class="status-step" id="step-in-progress">
+                        <div class="step-icon"><i class="fas fa-tools"></i></div>
+                        <div style="font-size: 0.8rem; font-weight: 600;">In Progress</div>
+                    </div>
+                    <div class="status-step" id="step-resolved">
+                        <div class="step-icon"><i class="fas fa-check-double"></i></div>
+                        <div style="font-size: 0.8rem; font-weight: 600;">Resolved</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 2rem;">
+                    <h3 style="font-size: 1.1rem; margin-bottom: 1rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem;">Description</h3>
+                    <p id="complaintDesc" style="line-height: 1.6; color: var(--text-main);">...</p>
+                </div>
+
+                <div class="meta-info">
+                    <div class="meta-item">
+                        <label>Location</label>
+                        <span id="complaintLocation">...</span>
+                    </div>
+                    <div class="meta-item">
+                        <label>Category</label>
+                        <span id="complaintCategory">General</span>
+                    </div>
+                    <div class="meta-item">
+                        <label>Updates</label>
+                        <span>Automated System Review</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const complaintId = urlParams.get('id');
+
+            if (!complaintId) {
+                window.location.href = 'complaint-list.html';
+                return;
+            }
+
+            try {
+                const c = await window.API.getComplaintById(complaintId);
+                
+                // Update UI
+                document.getElementById('refId').innerText = `#${c.id}`;
+                document.getElementById('complaintTitle').innerText = c.title;
+                document.getElementById('complaintDesc').innerText = c.description || "No description provided.";
+                document.getElementById('complaintLocation').innerText = c.location;
+                document.getElementById('filedDate').innerText = `Filed on ${new Date(c.createdAt).toLocaleDateString()}`;
+
+                const badge = document.getElementById('statusBadge');
+                badge.innerText = c.status.toUpperCase();
+                badge.className = `badge ${c.status === 'resolved' ? 'badge-success' : 'badge-warning'}`;
+
+                // Update Tracker
+                document.getElementById('step-pending').classList.add('completed');
+                if (c.status === 'in progress') {
+                    document.getElementById('step-in-progress').classList.add('active');
+                } else if (c.status === 'resolved') {
+                    document.getElementById('step-in-progress').classList.add('completed');
+                    document.getElementById('step-resolved').classList.add('completed');
+                } else {
+                    document.getElementById('step-pending').classList.add('active');
+                }
+
+            } catch (err) {
+                console.error("Failed to load complaint details:", err);
+                alert("Could not find this complaint.");
+                window.location.href = 'complaint-list.html';
+            }
+        });
+    </script>
+</body>
+</html>
