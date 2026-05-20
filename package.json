@@ -1,13 +1,13 @@
 {
-  "name": "ecosmart-root",
-  "version": "1.0.0",
-  "scripts": {
-    "start": "npx concurrently \"npm run start:dev --prefix eco-smart-backend\" \"npx http-server ./ -p 8080\"",
-    "backend": "npm run start:dev --prefix eco-smart-backend",
-    "frontend": "npx http-server ./ -p 8080"
-  },
-  "devDependencies": {
-    "concurrently": "^8.2.2",
-    "http-server": "^14.1.1"
-  }
+    "name": "ecosmart-root",
+    "version": "1.0.0",
+    "scripts": {
+        "start": "npx concurrently \"npm run start:dev --prefix eco-smart-backend\" \"npx http-server ./ -p 8080\"",
+        "backend": "npm run start:dev --prefix eco-smart-backend",
+        "frontend": "npx http-server ./ -p 8080"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2",
+        "http-server": "^14.1.1"
+    }
 }
