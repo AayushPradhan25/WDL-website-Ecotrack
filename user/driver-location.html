@@ -148,7 +148,8 @@
                     select.value = urlTruck;
                 }
                 selectedTruckId = Number(select.value);
-                document.getElementById('selectedTruck').textContent = trucks.find(t => t.id === selectedTruckId) ? .number || 'None';
+                const selectedTruck = trucks.find(t => t.id === selectedTruckId);
+                document.getElementById('selectedTruck').textContent = selectedTruck ? selectedTruck.number : 'None';
             } catch (err) {
                 console.error('Failed to load trucks:', err);
                 updateShareStatus('Unable to load trucks', 'error');
@@ -158,12 +159,12 @@
         function refreshSelectedTruck() {
             const select = document.getElementById('truckSelect');
             selectedTruckId = Number(select.value);
-            const selectedName = select.options[select.selectedIndex] ? .text || 'None';
+            const selectedName = select.options[select.selectedIndex] ? select.options[select.selectedIndex].text : 'None';
             document.getElementById('selectedTruck').textContent = selectedName;
         }
 
         async function handlePosition(position) {
-            if (!tracking || !position ? .coords || !selectedTruckId) return;
+            if (!tracking || !position || !position.coords || !selectedTruckId) return;
             const lat = position.coords.latitude;
             const lng = position.coords.longitude;
             document.getElementById('currentCoords').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
