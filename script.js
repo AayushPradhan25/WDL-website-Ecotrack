@@ -6,7 +6,7 @@
 
 // Use configuration from config.js if available, otherwise use defaults
 const CONFIG = window.EcoSmartConfig || {};
-const API_BASE = (CONFIG.api && CONFIG.api.baseUrl) || 'http://localhost:3000';
+const API_BASE = (CONFIG.api && CONFIG.api.baseUrl) || 'https://eco-smart-backend-3km1.onrender.com';
 const MAP_DEFAULT = (CONFIG.map && CONFIG.map.defaultCenter) || [28.6139, 77.2090];
 const TRUCK_ALERT_KM = (CONFIG.map && CONFIG.map.truckAlertRadius) || 2;
 const POLL_MS = (CONFIG.polling && CONFIG.polling.interval) || 8000;
