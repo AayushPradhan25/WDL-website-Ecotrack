@@ -13,7 +13,7 @@
         api: {
             // Base URL for the backend API
             // Can be overridden by setting window.ECO_SMART_API_URL before loading this script
-            baseUrl: window.ECO_SMART_API_URL || 'https: //eco-smart-backend-3km1.onrender.com',
+            baseUrl: window.ECO_SMART_API_URL || 'https://eco-smart-backend-3km1.onrender.com',
 
             // API endpoints prefix (if any)
             prefix: '',
