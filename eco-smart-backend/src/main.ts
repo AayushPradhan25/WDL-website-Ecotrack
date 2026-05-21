@@ -7,12 +7,11 @@ import { HttpExceptionFilter } from './common/http-exception.filter';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // CORS configuration - allow all origins in development
+  // 🔓 OPEN THE CORS GATES: This tells Render to stop blocking Vercel
   app.enableCors({
-    origin: 'https://ecotrackwdl.vercel.app',
+    origin: true, // Automatically mirrors and accepts your Vercel link
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   // Global validation pipe — validates request bodies automatically
@@ -21,7 +20,8 @@ async function bootstrap() {
   // Global exception filter for consistent error responses
   app.useGlobalFilters(new HttpExceptionFilter());
 
-  await app.listen(3000);
-  console.log('🚀 EcoSmart Backend running at http://localhost:3000');
+  // Render handles the port automatically
+  await app.listen(process.env.PORT || 3000);
+  console.log(`Application is running on port: ${process.env.PORT || 3000}`);
 }
 bootstrap();
