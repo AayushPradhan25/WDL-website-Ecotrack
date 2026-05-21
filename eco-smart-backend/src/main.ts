@@ -9,7 +9,7 @@ async function bootstrap() {
 
   // CORS configuration - allow all origins in development
   app.enableCors({
-    origin: true, // Allow all origins - use strict configuration in production
+    origin: 'https://ecotrackwdl.vercel.app',
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
