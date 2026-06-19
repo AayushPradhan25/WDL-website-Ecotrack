@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Driver Live Tracking | EcoSmart Admin</title>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Leaflet Maps CSS for tracking -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    <style>
+         :root {
+            --primary: #10b981;
+            --primary-light: #d1fae5;
+            --success: #059669;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg: #f0fdf4;
+            --sidebar-dark: #064e3b;
+            --border: #e2e8f0;
+            --text-muted: #64748b;
+            --radius: 1rem;
+        }
+        
+        .content-wrapper {
+            padding: 2rem;
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .tracking-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        
+        .tracking-header h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .tracking-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: var(--radius);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .stat-card h3 {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .value {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: #1e293b;
+        }
+        
+        .tracking-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+        
+        #trackingMap {
+            width: 100%;
+            height: 500px;
+            border-radius: var(--radius);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1;
+        }
+        
+        .drivers-list {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .drivers-list h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #1e293b;
+        }
+        
+        .driver-item {
+            padding: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 0.75rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .driver-item:hover {
+            border-color: var(--primary);
+            background: #f0fdf4;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.15);
+        }
+        
+        .driver-item.active {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            border-left: 4px solid var(--primary);
+        }
+        
+        .driver-info {
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+        
+        .driver-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #059669);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        
+        .driver-details {
+            flex: 1;
+        }
+        
+        .driver-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 0.95rem;
+        }
+        
+        .driver-phone {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.2rem;
+        }
+        
+        .driver-status {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+        }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.3rem 0.75rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        
+        .status-active {
+            background: #dcfce7;
+            color: var(--success);
+        }
+        
+        .status-inactive {
+            background: #f3f4f6;
+            color: var(--text-muted);
+        }
+        
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.active {
+            background: var(--success);
+        }
+        
+        .status-dot.inactive {
+            background: #d1d5db;
+        }
+        
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        
+        .driver-distance {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.3rem;
+        }
+        
+        .driver-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 0.5rem 0.75rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.3rem;
+        }
+        
+        .btn-activate {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-activate:hover {
+            background: var(--success);
+            transform: translateY(-2px);
+        }
+        
+        .btn-deactivate {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-deactivate:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+        }
+        
+        .btn-contact {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-contact:hover {
+            background: #d97706;
+            transform: translateY(-2px);
+        }
+        
+        .notification-zone {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: white;
+            padding: 1rem;
+            border-radius: var(--radius);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            max-width: 300px;
+            display: none;
+        }
+        
+        .notification-zone.show {
+            display: block;
+            animation: slideIn 0.3s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+        
+        .notification-zone h4 {
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .notification-zone p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+        
+        .radius-circle {
+            fill: none;
+            stroke: var(--primary);
+            stroke-dasharray: 5, 5;
+            opacity: 0.3;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--text-muted);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            color: #cbd5e1;
+            margin-bottom: 1rem;
+        }
+        
+        @media (max-width: 1024px) {
+            .tracking-container {
+                grid-template-columns: 1fr;
+            }
+            #trackingMap {
+                height: 400px;
+            }
+            .drivers-list {
+                max-height: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .content-wrapper {
+                padding: 1rem;
+            }
+            .tracking-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .tracking-stats {
+                grid-template-columns: 1fr;
+            }
+            #trackingMap {
+                height: 300px;
+            }
+            .driver-item {
+                padding: 0.75rem;
+            }
+            .driver-avatar {
+                width: 35px;
+                height: 35px;
+                font-size: 0.8rem;
+            }
+            .driver-actions {
+                flex-direction: column;
+            }
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="../style.css">
+</head>
+
+<body>
+    <div class="admin-container">
+        <!-- Persistent Sidebar (Injected by script.js) -->
+        <aside class="admin-sidebar"></aside>
+
+        <main class="admin-main">
+            <!-- Top Navigation (Injected by script.js) -->
+            <header class="admin-top-bar"></header>
+
+            <div class="content-wrapper">
+                <div class="tracking-header">
+                    <h2><i class="fas fa-map-marked-alt" style="color: var(--primary); margin-right: 0.5rem;"></i> Driver Live Tracking</h2>
+                    <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                        <button id="toggleTracking" class="btn" style="background: var(--primary); color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none; cursor: pointer; font-weight: 600;">
+                            <i class="fas fa-play"></i> Start Live Tracking
+                        </button>
+                        <button id="refreshBtn" class="btn" style="background: #3b82f6; color: white; padding: 0.75rem 1.5rem; border-radius: 0.5rem; border: none; cursor: pointer; font-weight: 600;">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tracking-stats">
+                    <div class="stat-card">
+                        <h3><i class="fas fa-user-tie"></i> Active Drivers</h3>
+                        <div class="value" id="activeDriverCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3><i class="fas fa-map-pin"></i> Tracked Vehicles</h3>
+                        <div class="value" id="trackedCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <h3><i class="fas fa-bell"></i> Zone Alerts</h3>
+                        <div class="value" id="alertCount">0</div>
+                    </div>
+                </div>
+
+                <div class="tracking-container">
+                    <div id="trackingMap"></div>
+                    <div class="drivers-list">
+                        <h3><i class="fas fa-list" style="margin-right: 0.5rem;"></i> Driver List</h3>
+                        <div id="driversList" class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No drivers available. Add drivers to see them here.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Zone -->
+                <div id="notificationZone" class="notification-zone">
+                    <h4><i class="fas fa-bell"></i> Zone Alert</h4>
+                    <p id="notificationText">Driver entered 1km radius zone</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Leaflet Library for mapping -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Core scripts -->
+    <script src="../config.js"></script>
+    <script src="../script.js"></script>
+
+    <script>
+        // ============================================
+        // DRIVER LIVE TRACKING SYSTEM
+        // ============================================
+
+        const GPSTracker = {
+            isTracking: false,
+            map: null,
+            markers: {},
+            driverData: {},
+            notificationZoneRadius: 1000, // 1km in meters
+            updateInterval: 5000, // Update every 5 seconds
+            updateIntervalId: null,
+            watchId: null,
+
+            async init() {
+                console.log('🚀 Initializing GPS Tracker...');
+
+                // Initialize map
+                this.initMap();
+
+                // Load drivers from backend
+                await this.loadDrivers();
+
+                // Setup event listeners
+                this.setupEventListeners();
+
+                // Check authentication
+                const token = localStorage.getItem('access_token');
+                if (!token) {
+                    UI.notify('Please log in to access driver tracking', 'warning');
+                    setTimeout(() => window.location.href = '../admin/admin-login.html', 2000);
+                }
+            },
+
+            initMap() {
+                // Default center (New Delhi)
+                const defaultCenter = [28.6139, 77.2090];
+
+                this.map = L.map('trackingMap').setView(defaultCenter, 13);
+
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors',
+                    maxZoom: 19,
+                }).addTo(this.map);
+
+                // Add radius visualization circle if a driver is selected
+                this.radiusCircle = L.circle(defaultCenter, {
+                    radius: this.notificationZoneRadius,
+                    color: 'var(--primary)',
+                    fill: true,
+                    fillColor: 'var(--primary)',
+                    fillOpacity: 0.1,
+                    dashArray: '5, 5',
+                }).addTo(this.map);
+                this.radiusCircle.hideLabel = true;
+            },
+
+            async loadDrivers() {
+                try {
+                    const token = localStorage.getItem('access_token');
+                    const response = await fetch(`${API_BASE}/trucks`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (!response.ok) throw new Error('Failed to load drivers');
+
+                    const drivers = await response.json();
+
+                    // Mock driver data with GPS capability (in production, get from backend)
+                    this.driverData = drivers.map(truck => ({
+                        id: truck.id,
+                        name: truck.driverName || `Driver ${truck.id}`,
+                        phone: truck.driverPhoneNumber || 'N/A',
+                        truckId: truck.id,
+                        location: {
+                            lat: 28.6139 + (Math.random() - 0.5) * 0.05,
+                            lng: 77.2090 + (Math.random() - 0.5) * 0.05
+                        },
+                        isActive: false,
+                        lastUpdated: new Date(),
+                    })) || [];
+
+                    console.log('📍 Loaded drivers:', this.driverData);
+                    this.updateDriversList();
+                } catch (error) {
+                    console.error('❌ Error loading drivers:', error);
+                    UI.notify('Failed to load drivers', 'error');
+                }
+            },
+
+            setupEventListeners() {
+                const toggleBtn = document.getElementById('toggleTracking');
+                const refreshBtn = document.getElementById('refreshBtn');
+
+                toggleBtn.addEventListener('click', () => {
+                    this.isTracking ? this.stopTracking() : this.startTracking();
+                });
+
+                refreshBtn.addEventListener('click', () => {
+                    this.loadDrivers();
+                    UI.notify('Drivers list refreshed', 'success');
+                });
+            },
+
+            startTracking() {
+                this.isTracking = true;
+                document.getElementById('toggleTracking').textContent = '⏹ Stop Live Tracking';
+                document.getElementById('toggleTracking').style.background = 'var(--danger)';
+
+                UI.notify('Live tracking started', 'success');
+
+                // Update positions every 5 seconds
+                this.updateIntervalId = setInterval(() => {
+                    this.updateDriverLocations();
+                }, this.updateInterval);
+
+                // Initial update
+                this.updateDriverLocations();
+            },
+
+            stopTracking() {
+                this.isTracking = false;
+                document.getElementById('toggleTracking').textContent = '▶ Start Live Tracking';
+                document.getElementById('toggleTracking').style.background = 'var(--primary)';
+
+                if (this.updateIntervalId) {
+                    clearInterval(this.updateIntervalId);
+                }
+
+                UI.notify('Live tracking stopped', 'info');
+            },
+
+            async updateDriverLocations() {
+                // Simulate location updates (in production, get from mobile GPS)
+                this.driverData.forEach(driver => {
+                    if (driver.isActive) {
+                        // Simulate realistic movement
+                        driver.location.lat += (Math.random() - 0.5) * 0.001;
+                        driver.location.lng += (Math.random() - 0.5) * 0.001;
+                        driver.lastUpdated = new Date();
+
+                        // Update marker on map
+                        this.updateDriverMarker(driver);
+
+                        // Check notification radius
+                        this.checkNotificationZones(driver);
+                    }
+                });
+            },
+
+            updateDriverMarker(driver) {
+                const markerId = `driver-${driver.id}`;
+
+                if (this.markers[markerId]) {
+                    // Update existing marker
+                    this.markers[markerId].setLatLng([driver.location.lat, driver.location.lng]);
+                } else {
+                    // Create new marker
+                    const icon = L.divIcon({
+                        html: `<div style="
+                            width: 40px;
+                            height: 40px;
+                            background: linear-gradient(135deg, var(--primary), #059669);
+                            border-radius: 50%;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            color: white;
+                            font-weight: 700;
+                            font-size: 1rem;
+                            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                            border: 3px solid white;
+                        ">
+                            <i class="fas fa-car-side"></i>
+                        </div>`,
+                        className: 'driver-marker',
+                        iconSize: [40, 40],
+                        iconAnchor: [20, 20],
+                    });
+
+                    const marker = L.marker([driver.location.lat, driver.location.lng], {
+                            icon
+                        })
+                        .bindPopup(`<strong>${driver.name}</strong><br>Phone: ${driver.phone}<br>Status: ${driver.isActive ? 'Active' : 'Inactive'}`)
+                        .addTo(this.map);
+
+                    this.markers[markerId] = marker;
+                }
+            },
+
+            checkNotificationZones(driver) {
+                // Calculate distance from random notification point (simulation)
+                const notificationPoint = [28.6139, 77.2090]; // Central point
+                const distance = this.calculateDistance(
+                    driver.location.lat,
+                    driver.location.lng,
+                    notificationPoint[0],
+                    notificationPoint[1]
+                );
+
+                if (distance < 1) { // 1km threshold
+                    this.showNotification(driver, distance);
+                }
+            },
+
+            calculateDistance(lat1, lng1, lat2, lng2) {
+                // Haversine formula to calculate distance in km
+                const R = 6371;
+                const dLat = (lat2 - lat1) * Math.PI / 180;
+                const dLng = (lng2 - lng1) * Math.PI / 180;
+                const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                    Math.sin(dLng / 2) * Math.sin(dLng / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+                return R * c;
+            },
+
+            showNotification(driver, distance) {
+                const notifZone = document.getElementById('notificationZone');
+                const notifText = document.getElementById('notificationText');
+
+                notifText.innerHTML = `<strong>${driver.name}</strong> is ${(distance * 1000).toFixed(0)}m away from notification zone`;
+                notifZone.classList.add('show');
+
+                // Hide after 5 seconds
+                setTimeout(() => {
+                    notifZone.classList.remove('show');
+                }, 5000);
+
+                // Increment alert count
+                const alertCount = document.getElementById('alertCount');
+                alertCount.textContent = parseInt(alertCount.textContent) + 1;
+            },
+
+            updateDriversList() {
+                const driversList = document.getElementById('driversList');
+
+                if (this.driverData.length === 0) {
+                    driversList.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No drivers available</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                driversList.innerHTML = this.driverData.map(driver => `
+                    <div class="driver-item ${driver.isActive ? 'active' : ''}" onclick="GPSTracker.selectDriver('${driver.id}')">
+                        <div class="driver-info">
+                            <div class="driver-avatar">${driver.name.charAt(0)}</div>
+                            <div class="driver-details">
+                                <div class="driver-name">${driver.name}</div>
+                                <div class="driver-phone"><i class="fas fa-phone"></i> ${driver.phone}</div>
+                                <div class="driver-status">
+                                    <span class="status-dot ${driver.isActive ? 'active' : 'inactive'}"></span>
+                                    <span class="status-badge ${driver.isActive ? 'status-active' : 'status-inactive'}">
+                                        ${driver.isActive ? '🟢 Active' : '⚫ Offline'}
+                                    </span>
+                                </div>
+                                <div class="driver-distance">Last updated: ${this.formatTime(driver.lastUpdated)}</div>
+                            </div>
+                        </div>
+                        <div class="driver-actions">
+                            <button class="action-btn ${driver.isActive ? 'btn-deactivate' : 'btn-activate'}" onclick="GPSTracker.toggleDriverStatus('${driver.id}', event)">
+                                ${driver.isActive ? '<i class="fas fa-power-off"></i> Deactivate' : '<i class="fas fa-play"></i> Activate'}
+                            </button>
+                            <a href="tel:${driver.phone}" class="action-btn btn-contact" style="text-decoration: none;">
+                                <i class="fas fa-phone"></i> Call
+                            </a>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Update stats
+                this.updateStats();
+            },
+
+            selectDriver(driverId) {
+                const driver = this.driverData.find(d => d.id === driverId);
+                if (driver && driver.isActive) {
+                    this.map.setView([driver.location.lat, driver.location.lng], 15);
+
+                    // Update radius circle
+                    this.radiusCircle.setLatLng([driver.location.lat, driver.location.lng]);
+                }
+            },
+
+            toggleDriverStatus(driverId, event) {
+                event.stopPropagation();
+
+                const driver = this.driverData.find(d => d.id === driverId);
+                if (driver) {
+                    driver.isActive = !driver.isActive;
+                    this.updateDriversList();
+
+                    if (driver.isActive) {
+                        UI.notify(`${driver.name} is now on duty`, 'success');
+                        // Center map on active driver
+                        this.map.setView([driver.location.lat, driver.location.lng], 15);
+                    } else {
+                        UI.notify(`${driver.name} is now off duty`, 'info');
+                    }
+                }
+            },
+
+            updateStats() {
+                const activeCount = this.driverData.filter(d => d.isActive).length;
+                document.getElementById('activeDriverCount').textContent = activeCount;
+                document.getElementById('trackedCount').textContent = this.driverData.length;
+            },
+
+            formatTime(date) {
+                return new Date(date).toLocaleTimeString('en-IN', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+            }
+        };
+
+        // Initialize tracker when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            GPSTracker.init();
+        });
+    </script>
+</body>
+
+</html>
