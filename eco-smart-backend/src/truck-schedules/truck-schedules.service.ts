@@ -14,15 +14,25 @@ export class TruckSchedulesService {
   }
 
   async findAll() {
-    return this.prisma.schedule.findMany({ include: { truck: true }, orderBy: [{ dayOfWeek: 'asc' }, { time: 'asc' }] });
+    return this.prisma.schedule.findMany({
+      include: { truck: true },
+      orderBy: [{ dayOfWeek: 'asc' }, { time: 'asc' }],
+    });
   }
 
   async findOne(id: number) {
-    return this.prisma.schedule.findUnique({ where: { id }, include: { truck: true } });
+    return this.prisma.schedule.findUnique({
+      where: { id },
+      include: { truck: true },
+    });
   }
 
   async update(id: number, dto: UpdateScheduleDto) {
-    return this.prisma.schedule.update({ where: { id }, data: dto, include: { truck: true } });
+    return this.prisma.schedule.update({
+      where: { id },
+      data: dto,
+      include: { truck: true },
+    });
   }
 
   async remove(id: number) {

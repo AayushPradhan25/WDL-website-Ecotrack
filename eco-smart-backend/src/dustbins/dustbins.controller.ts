@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
 import { DustbinsService } from './dustbins.service';
 import { CreateDustbinDto, UpdateDustbinDto } from './dto/dustbin.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';

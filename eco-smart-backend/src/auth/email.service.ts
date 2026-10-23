@@ -19,7 +19,11 @@ export class EmailService {
     });
   }
 
-  async sendPasswordResetEmail(email: string, resetToken: string, userName: string) {
+  async sendPasswordResetEmail(
+    email: string,
+    resetToken: string,
+    userName: string,
+  ) {
     const resetLink = `${process.env.FRONTEND_URL || 'http://localhost:8080'}/user/reset-password.html?token=${resetToken}`;
 
     const mailOptions = {

@@ -30,5 +30,5 @@ if (fs.existsSync(linkPath)) {
     }
 }
 
-fs.symlinkSync(targetPrismaPath, linkPath, 'dir');
+fs.symlinkSync(targetPrismaPath, linkPath, process.platform === 'win32' ? 'junction' : 'dir');
 console.log('Created Prisma symlink:', linkPath, '->', targetPrismaPath);

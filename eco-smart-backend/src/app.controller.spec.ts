@@ -4,7 +4,6 @@ import { PrismaService } from './prisma.service';
 
 describe('AppController', () => {
   let appController: AppController;
-  let prismaService: PrismaService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
@@ -13,24 +12,22 @@ describe('AppController', () => {
         {
           provide: PrismaService,
           useValue: {
-            user: {
-              findMany: jest.fn().mockResolvedValue([]),
-              create: jest.fn().mockResolvedValue({ id: 1, email: 'test@test.com', name: 'Test' }),
-            },
+            user: { findMany: jest.fn().mockResolvedValue([]) },
+            complaint: { count: jest.fn().mockResolvedValue(0) },
+            truck: { count: jest.fn().mockResolvedValue(0) },
+            dustbin: { count: jest.fn().mockResolvedValue(0) },
           },
         },
       ],
     }).compile();
 
     appController = module.get<AppController>(AppController);
-    prismaService = module.get<PrismaService>(PrismaService);
   });
 
-  describe('GET /users', () => {
-    it('should return an array of users', async () => {
-      const result = await appController.getUsers();
-      expect(result).toEqual([]);
-      expect(prismaService.user.findMany).toHaveBeenCalled();
+  describe('GET /', () => {
+    it('should return health status', () => {
+      const result = appController.getHello();
+      expect(result).toHaveProperty('status', 'healthy');
     });
   });
 });

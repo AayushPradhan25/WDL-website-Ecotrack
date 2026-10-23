@@ -1,6 +1,21 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Patch,
+  Delete,
+  Param,
+  Body,
+  UseGuards,
+  Query,
+} from '@nestjs/common';
 import { TrucksService } from './trucks.service';
-import { CreateTruckDto, UpdateTruckDto, UpdateTruckLocationDto, AddTruckLogDto } from './dto/truck.dto';
+import {
+  CreateTruckDto,
+  UpdateTruckDto,
+  UpdateTruckLocationDto,
+  AddTruckLogDto,
+} from './dto/truck.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -10,10 +25,10 @@ import { Roles } from '../auth/roles.decorator';
 export class TrucksController {
   constructor(private readonly trucksService: TrucksService) {}
 
-  // GET /trucks — Any logged-in user
+  // GET /trucks?status=active — Any logged-in user
   @Get()
-  findAll() {
-    return this.trucksService.findAll();
+  findAll(@Query('status') status?: string) {
+    return this.trucksService.findAll(status);
   }
 
   // GET /trucks/:id — Any logged-in user
@@ -38,9 +53,14 @@ export class TrucksController {
     return this.trucksService.update(+id, updateTruckDto);
   }
 
-  // PATCH /trucks/:id/location — authenticated drivers can push live GPS coordinates
+  // PATCH /trucks/:id/location — Admin only: update live GPS coordinates
   @Patch(':id/location')
-  updateLocation(@Param('id') id: string, @Body() updateTruckLocationDto: UpdateTruckLocationDto) {
+  @UseGuards(RolesGuard)
+  @Roles('ADMIN')
+  updateLocation(
+    @Param('id') id: string,
+    @Body() updateTruckLocationDto: UpdateTruckLocationDto,
+  ) {
     return this.trucksService.updateLocation(+id, updateTruckLocationDto);
   }
 

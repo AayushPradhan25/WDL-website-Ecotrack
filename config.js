@@ -12,8 +12,11 @@
         // API Configuration
         api: {
             // Base URL for the backend API
-            // Can be overridden by setting window.ECO_SMART_API_URL before loading this script
-            baseUrl: window.ECO_SMART_API_URL || 'https://eco-smart-backend-3km1.onrender.com',
+            // Auto-detects local server on localhost / file:// protocol
+            baseUrl: window.ECO_SMART_API_URL || 
+                (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:' 
+                    ? 'http://localhost:3000' 
+                    : 'https://eco-smart-backend-3km1.onrender.com'),
 
             // API endpoints prefix (if any)
             prefix: '',
